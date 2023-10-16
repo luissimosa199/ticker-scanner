@@ -5,7 +5,7 @@ export interface TicketItem {
   total: number;
 }
 
-interface Discounts {
+export interface Discounts {
   disc_items: { desc_name: string; desc_amount: string }[];
   disc_total: string;
 }
