@@ -7,4 +7,5 @@ export class CreateTicketDto {
   rawTicketHTML: string;
   ogTicketUrl: string;
   supermarket: Supermarket;
+  user?: string;
 }

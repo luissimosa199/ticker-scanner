@@ -85,7 +85,7 @@ export class DiscoTicketParser implements SupermarketParser {
       const tds = tr.querySelectorAll('td');
       return {
         desc_name: tds[0].textContent.trim(),
-        desc_amount: tds[1].textContent.trim(),
+        desc_amount: Math.abs(parseNumberString(tds[1].textContent.trim())),
       };
     });
 
@@ -96,7 +96,10 @@ export class DiscoTicketParser implements SupermarketParser {
       .querySelector('td:nth-child(2) div')
       .textContent.trim();
 
-    const discounts = { disc_items, disc_total };
+    const discounts = {
+      disc_items,
+      disc_total: Math.abs(parseNumberString(disc_total)),
+    };
 
     // PAYMENT_METHOD
 

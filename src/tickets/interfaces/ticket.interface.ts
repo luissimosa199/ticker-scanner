@@ -6,8 +6,8 @@ export interface TicketItem {
 }
 
 export interface Discounts {
-  disc_items: { desc_name: string; desc_amount: string }[];
-  disc_total: string;
+  disc_items: { desc_name: string; desc_amount: number }[];
+  disc_total: number;
 }
 
 export interface Ticket {
@@ -19,4 +19,5 @@ export interface Ticket {
   discounts: Discounts;
   paymentMethod: string;
   ogTicketUrl: string;
+  user?: string;
 }

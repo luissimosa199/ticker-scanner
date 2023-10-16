@@ -21,7 +21,10 @@ export class TicketsService {
       createTicketDto.ogTicketUrl,
     );
 
-    const ticket = this.ticketsRepository.create(parsedData);
+    const ticket = this.ticketsRepository.create({
+      ...parsedData,
+      user: createTicketDto.user,
+    });
 
     return this.ticketsRepository.save(ticket);
   }

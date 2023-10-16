@@ -37,6 +37,9 @@ export class Ticket {
   @Column()
   ogTicketUrl: string;
 
+  @Column()
+  user?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
