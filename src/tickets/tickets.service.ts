@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
 import { Ticket } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ObjectId, Repository } from 'typeorm';
 
 @Injectable()
 export class TicketsService {
@@ -39,21 +38,31 @@ export class TicketsService {
     return this.ticketsRepository.save(ticket);
   }
 
-  findAll() {
-    const tickets = this.ticketsRepository.find();
+  findAll(username: string) {
+    const tickets = this.ticketsRepository.find({
+      where: {
+        user: username,
+      },
+    });
     return tickets;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} ticket`;
+  findOne(id: string, user: string) {
+    return this.ticketsRepository.findOne({
+      where: {
+        _id: new ObjectId(id),
+        user: user,
+      },
+    });
   }
 
-  update(id: string, updateTicketDto: UpdateTicketDto) {
-    console.log(updateTicketDto);
-    return `This action updates a #${id} ticket`;
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} ticket`;
+  async remove(id: string, user: string) {
+    const ticket = await this.findOne(id, user);
+    if (!ticket) {
+      throw new NotFoundException(
+        `Ticket #${id} not found or doesn't belong to user`,
+      );
+    }
+    return this.ticketsRepository.remove(ticket);
   }
 }
