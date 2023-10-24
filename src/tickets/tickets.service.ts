@@ -8,7 +8,7 @@ import { ObjectId, Repository } from 'typeorm';
 @Injectable()
 export class TicketsService {
   constructor(
-    private readonly ticketParser: TicketParserService,
+    protected readonly ticketParser: TicketParserService,
     @InjectRepository(Ticket)
     private ticketsRepository: Repository<Ticket>,
   ) {}
