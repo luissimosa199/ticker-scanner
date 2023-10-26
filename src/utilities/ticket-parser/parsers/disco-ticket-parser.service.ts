@@ -52,7 +52,7 @@ export class DiscoTicketParser implements SupermarketParser {
       return { name, quantity, price, total };
     });
 
-    // TOTAL AMOUN
+    // TOTAL AMOUNT
     const totalAmountElements = doc.querySelectorAll(
       '.total-import.right.bold > div',
     );
