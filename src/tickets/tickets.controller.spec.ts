@@ -1,3 +1,4 @@
+import { parsedData } from './mocks/parsedData';
 import { sampleDto } from './mocks/sampleDto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TicketsController } from './tickets.controller';
@@ -8,17 +9,20 @@ import { Ticket } from './entities/ticket.entity';
 import { TicketsService } from './tickets.service';
 import { ObjectId } from 'mongodb';
 import { NotFoundException } from '@nestjs/common';
+import { CreateTicketDto } from './dto/create-ticket.dto';
 
 describe('TicketsController', () => {
   let controller: TicketsController;
   let service: any;
 
-  const mockCreate = jest.fn();
-  const mockFindAll = jest.fn();
-  const mockGetProfile = jest.fn();
-  const mockfindOne = jest.fn();
-  const mockremove = jest.fn();
-  const mockCreateAndSave = jest.fn();
+  const mockCreate: jest.Mock<Ticket, [CreateTicketDto]> = jest.fn();
+  const mockCreateAndSave: jest.Mock<
+    Promise<Ticket>,
+    [any, CreateTicketDto]
+  > = jest.fn();
+  const mockFindAll: jest.Mock<Promise<Ticket[]>> = jest.fn();
+  const mockfindOne: jest.Mock<Promise<Ticket>, [string]> = jest.fn();
+  const mockremove: jest.Mock<Promise<Ticket>, [string]> = jest.fn();
 
   beforeEach(async () => {
     const mockRepository = {
@@ -41,7 +45,6 @@ describe('TicketsController', () => {
           useValue: {
             create: mockCreate,
             findAll: mockFindAll,
-            getProfile: mockGetProfile,
             findOne: mockfindOne,
             remove: mockremove,
             createAndSave: mockCreateAndSave,
@@ -58,28 +61,33 @@ describe('TicketsController', () => {
     service = module.get<TicketsService>(TicketsService);
   });
 
+  const mockedTicket: Ticket = {
+    ...parsedData,
+    _id: new ObjectId(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
   it('should create a ticket (create method)', async () => {
-    service.create.mockReturnValue(sampleDto);
+    service.create.mockReturnValue(mockedTicket);
 
-    expect(await controller.create(sampleDto)).toEqual(sampleDto);
+    expect(controller.create(sampleDto)).toEqual(mockedTicket);
   });
 
   it('should create and save a ticket (createAndSave method)', async () => {
     const user = 'test@example.com';
-
-    service.createAndSave.mockReturnValue(sampleDto);
-
+    service.createAndSave.mockReturnValue(mockedTicket);
     expect(
       await controller.createAndSave({ user: { username: user } }, sampleDto),
-    ).toEqual(sampleDto);
+    ).toEqual(mockedTicket);
   });
 
   it('should find all tickets for a user (findAll method)', async () => {
-    const tickets = [sampleDto, sampleDto];
+    const tickets = [mockedTicket, mockedTicket];
     const user = 'test@example.com';
     service.findAll.mockReturnValue(tickets);
     expect(await controller.findAll({ user: { username: user } })).toEqual(
@@ -90,7 +98,10 @@ describe('TicketsController', () => {
   it('should find all tickets for a user (findOne method)', async () => {
     const username = 'luissimosaarg@gmail.com';
     const id = new ObjectId().toHexString();
-    const ticket = new Ticket();
+    const ticket = {
+      ...mockedTicket,
+      _id: id,
+    };
 
     service.findOne.mockReturnValue(ticket);
     expect(await controller.findOne({ user: { username } }, id)).toEqual(
@@ -110,7 +121,10 @@ describe('TicketsController', () => {
   it('should remove a ticket for a user (remove method)', async () => {
     const username = 'luissimosaarg@gmail.com';
     const id = 'someObjectId';
-    const ticket = new Ticket();
+    const ticket = {
+      ...mockedTicket,
+      _id: id,
+    };
 
     service.remove.mockResolvedValue(ticket);
     expect(await controller.remove({ user: { username } }, id)).toEqual(ticket);
