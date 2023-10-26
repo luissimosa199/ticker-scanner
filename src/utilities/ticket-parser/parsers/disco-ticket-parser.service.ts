@@ -77,28 +77,60 @@ export class DiscoTicketParser implements SupermarketParser {
     const date = emisionText ? emisionText.split(':')[1].trim() : '';
 
     // DISCOUNTS
-    const discountsHTML = doc
-      .querySelector('table.table-discounts')
-      .querySelectorAll('tbody tr');
+    // const discountsHTML = doc
+    //   .querySelector('table.table-discounts')
+    //   .querySelectorAll('tbody tr');
 
-    const disc_items = Array.from(discountsHTML, (tr) => {
-      const tds = tr.querySelectorAll('td');
-      return {
-        desc_name: tds[0].textContent.trim(),
-        desc_amount: Math.abs(parseNumberString(tds[1].textContent.trim())),
-      };
-    });
+    // const disc_items = Array.from(discountsHTML, (tr) => {
+    //   const tds = tr.querySelectorAll('td');
+    //   return {
+    //     desc_name: tds[0].textContent.trim(),
+    //     desc_amount: Math.abs(parseNumberString(tds[1].textContent.trim())),
+    //   };
+    // });
 
-    const disc_total = doc
-      .querySelector(
-        'body > table > tbody > tr:nth-child(7) > td > table:nth-child(3)',
-      )
-      .querySelector('td:nth-child(2) div')
-      .textContent.trim();
+    // const disc_total = doc
+    //   .querySelector(
+    //     'body > table > tbody > tr:nth-child(7) > td > table:nth-child(3)',
+    //   )
+    //   .querySelector('td:nth-child(2) div')
+    //   .textContent.trim();
+
+    // const discounts = {
+    //   disc_items,
+    //   disc_total: Math.abs(parseNumberString(disc_total)),
+    // };
+
+    // DISCOUNTS
+    const discountsTable = doc.querySelector('table.table-discounts');
+    let disc_items: { desc_name: string; desc_amount: number }[] = [];
+    let disc_total: number = 0;
+
+    if (discountsTable) {
+      disc_items = Array.from(
+        discountsTable.querySelectorAll('tbody tr'),
+        (tr) => {
+          const tds = tr.querySelectorAll('td');
+          return {
+            desc_name: tds[0].textContent.trim(),
+            desc_amount: Math.abs(parseNumberString(tds[1].textContent.trim())),
+          };
+        },
+      );
+
+      const discTotalElem = doc.querySelector(
+        'body > table > tbody > tr:nth-child(7) > td > table:nth-child(3) > tbody > tr > td:nth-child(2) div',
+      );
+      if (discTotalElem) {
+        disc_total = Math.abs(
+          parseNumberString(discTotalElem.textContent.trim()),
+        );
+      }
+    }
 
     const discounts = {
       disc_items,
-      disc_total: Math.abs(parseNumberString(disc_total)),
+      disc_total,
     };
 
     // PAYMENT_METHOD
