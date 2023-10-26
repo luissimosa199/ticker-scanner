@@ -23,7 +23,7 @@ export class TicketsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/save')
-  getProfile(@Request() req, @Body() createTicketDto: CreateTicketDto) {
+  createAndSave(@Request() req, @Body() createTicketDto: CreateTicketDto) {
     return this.ticketsService.createAndSave(
       createTicketDto,
       req.user.username,
