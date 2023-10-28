@@ -20,7 +20,7 @@ export class TicketsService {
       createTicketDto.ogTicketUrl,
     );
 
-    return parsedData;
+    return { ...parsedData, supermarket: createTicketDto.supermarket };
   }
 
   createAndSave(createTicketDto: CreateTicketDto, user: string) {
@@ -33,6 +33,7 @@ export class TicketsService {
     const ticket = this.ticketsRepository.create({
       ...parsedData,
       user,
+      supermarket: createTicketDto.supermarket,
     });
 
     return this.ticketsRepository.save(ticket);

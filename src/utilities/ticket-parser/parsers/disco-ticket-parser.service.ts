@@ -3,6 +3,7 @@ import { parseNumberString } from '../../parseNumberString';
 import { Ticket } from 'src/tickets/interfaces/ticket.interface';
 import { SupermarketParser } from '../interfaces/supermarket-parser.interface';
 import { JSDOM } from 'jsdom';
+import { HtmlStructureError } from '../errors/html-structure.error';
 
 @Injectable()
 export class DiscoTicketParser implements SupermarketParser {
@@ -12,7 +13,18 @@ export class DiscoTicketParser implements SupermarketParser {
 
     // MAIN SELECTORS
     const element = doc.querySelector('.table-full');
+
+    if (!element) {
+      throw new HtmlStructureError("Couldn't find the main table selector.");
+    }
+
     const articles = element?.querySelectorAll('.table-full-alt') || [];
+
+    if (!articles.length) {
+      throw new HtmlStructureError(
+        "Couldn't find article rows in the main table.",
+      );
+    }
 
     // TICKET ITEMS
     const ticketItems: Ticket['ticketItems'] = Array.from(articles).map((e) => {
@@ -52,6 +64,12 @@ export class DiscoTicketParser implements SupermarketParser {
       return { name, quantity, price, total };
     });
 
+    if (!ticketItems.length) {
+      throw new HtmlStructureError(
+        'There has been an error parsing the the articles.',
+      );
+    }
+
     // TOTAL AMOUNT
     const totalAmountElements = doc.querySelectorAll(
       '.total-import.right.bold > div',
@@ -59,6 +77,12 @@ export class DiscoTicketParser implements SupermarketParser {
 
     const totalAmountString = totalAmountElements[1]?.textContent?.trim() || '';
     const totalAmount = parseNumberString(totalAmountString);
+
+    if (!totalAmount) {
+      throw new HtmlStructureError(
+        'There has been an error parsing the total amount of the ticket.',
+      );
+    }
 
     // LOGO LINK
     const logoLink = doc.querySelector('img')?.src || '';
@@ -135,11 +159,12 @@ export class DiscoTicketParser implements SupermarketParser {
 
     // PAYMENT_METHOD
 
-    const paymentMethod = doc
-      .querySelector(
-        'body > table > tbody > tr:nth-child(13) > td > table > tbody > tr:nth-child(1) > td:nth-child(1) > div',
-      )
-      .textContent.trim();
+    const paymentMethod =
+      doc
+        .querySelector(
+          'body > table > tbody > tr:nth-child(13) > td > table > tbody > tr:nth-child(1) > td:nth-child(1) > div',
+        )
+        .textContent.trim() || 'Payment Method not recognized';
 
     return {
       ticketItems,

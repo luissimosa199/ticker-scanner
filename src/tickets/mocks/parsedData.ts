@@ -97,6 +97,7 @@ export const parsedData = {
   ogTicketUrl:
     'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzVfNl8wMTU0MDA1MDE5OTIzMTAxMTIwMDA=',
   user: 'luissimosaarg@gmail.com',
+  supermarket: 'DISCO',
   createdAt: {
     $date: '2023-10-16T23:10:51.557Z',
   },

@@ -38,6 +38,9 @@ export class Ticket {
   ogTicketUrl: string;
 
   @Column()
+  supermarket: string;
+
+  @Column()
   user?: string;
 
   @CreateDateColumn()
