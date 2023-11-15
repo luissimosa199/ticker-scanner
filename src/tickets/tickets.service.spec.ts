@@ -8,7 +8,7 @@ import { DiscoTicketParser } from 'src/utilities/ticket-parser/parsers/disco-tic
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Ticket } from './entities/ticket.entity';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { parsedData } from './mocks/parsedData';
 import { sampleDto } from './mocks/sampleDto';
@@ -55,21 +55,35 @@ describe('TicketsService', () => {
     expect(service.create(sampleDto)).toEqual(parsedData);
   });
 
-  it('should save and return a ticket (createAndSave method)', async () => {
-    const ticket = new Ticket();
-
+  it('should throw ConflictException if ticket is duplicate', async () => {
     jest
       .spyOn(service.testableTicketParser, 'parse')
       .mockReturnValue(parsedData);
 
+    const ticket = new Ticket();
     mockRepository.create.mockReturnValue(ticket);
-    mockRepository.save.mockResolvedValue(ticket);
 
-    const result = await service.createAndSave(
-      sampleDto,
-      'luissimosaarg@gmail.com',
-    );
-    expect(result).toEqual(ticket);
+    mockRepository.findOne.mockResolvedValueOnce({
+      ogTicketUrl: sampleDto.ogTicketUrl,
+    });
+
+    try {
+      await service.createAndSave(sampleDto, 'test@email.com');
+      fail('Expected ConflictException but none was thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ConflictException);
+      expect(err.message).toBe('Duplicate ticket');
+    }
+  });
+
+  it('should throw ConflictException if ticket is duplicate', async () => {
+    const ticket = new Ticket();
+
+    mockRepository.findOne.mockResolvedValueOnce(ticket);
+
+    expect(
+      service.createAndSave(sampleDto, 'luissimosaarg@gmail.com'),
+    ).rejects.toThrow(ConflictException);
   });
 
   it('should return all tickets for a user (findAll method)', async () => {

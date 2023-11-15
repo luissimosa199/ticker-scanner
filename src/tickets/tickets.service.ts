@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
 import { Ticket } from './entities/ticket.entity';
@@ -23,7 +27,7 @@ export class TicketsService {
     return { ...parsedData, supermarket: createTicketDto.supermarket };
   }
 
-  createAndSave(createTicketDto: CreateTicketDto, user: string) {
+  async createAndSave(createTicketDto: CreateTicketDto, user: string) {
     const parsedData = this.ticketParser.parse(
       createTicketDto.supermarket,
       createTicketDto.rawTicketHTML,
@@ -35,6 +39,18 @@ export class TicketsService {
       user,
       supermarket: createTicketDto.supermarket,
     });
+
+    const potentialDuplicate = await this.ticketsRepository.findOne({
+      where: {
+        createdAt: ticket.createdAt,
+        totalAmount: ticket.totalAmount,
+        ogTicketUrl: ticket.ogTicketUrl,
+      },
+    });
+
+    if (potentialDuplicate) {
+      throw new ConflictException('Duplicate ticket');
+    }
 
     return this.ticketsRepository.save(ticket);
   }

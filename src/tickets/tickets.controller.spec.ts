@@ -8,7 +8,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Ticket } from './entities/ticket.entity';
 import { TicketsService } from './tickets.service';
 import { ObjectId } from 'mongodb';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 
 describe('TicketsController', () => {
@@ -84,6 +84,18 @@ describe('TicketsController', () => {
     expect(
       await controller.createAndSave({ user: { username: user } }, sampleDto),
     ).toEqual(mockedTicket);
+  });
+
+  it('should throw ConflictException if ticket is duplicate', async () => {
+    const user = 'test@example.com';
+
+    jest
+      .spyOn(service, 'createAndSave')
+      .mockRejectedValue(new ConflictException('Duplicate ticket'));
+
+    await expect(
+      controller.createAndSave({ user: { username: user } }, sampleDto),
+    ).rejects.toThrow(ConflictException);
   });
 
   it('should find all tickets for a user (findAll method)', async () => {
