@@ -7,7 +7,8 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
 import { Ticket } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectId, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class TicketsService {
@@ -65,12 +66,14 @@ export class TicketsService {
   }
 
   findOne(id: string, user: string) {
-    return this.ticketsRepository.findOne({
+    const ticket = this.ticketsRepository.findOne({
       where: {
         _id: new ObjectId(id),
         user: user,
       },
     });
+
+    return ticket;
   }
 
   async remove(id: string, user: string) {
