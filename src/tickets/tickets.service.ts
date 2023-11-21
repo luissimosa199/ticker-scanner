@@ -43,8 +43,6 @@ export class TicketsService {
 
     const potentialDuplicate = await this.ticketsRepository.findOne({
       where: {
-        createdAt: ticket.createdAt,
-        totalAmount: ticket.totalAmount,
         ogTicketUrl: ticket.ogTicketUrl,
       },
     });
