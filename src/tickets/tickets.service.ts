@@ -29,11 +29,15 @@ export class TicketsService {
   }
 
   async createAndSave(createTicketDto: CreateTicketDto, user: string) {
-    const parsedData = this.ticketParser.parse(
-      createTicketDto.supermarket,
-      createTicketDto.rawTicketHTML,
-      createTicketDto.ogTicketUrl,
-    );
+    let parsedData;
+
+    if (createTicketDto.supermarket === 'DISCO' || 'JUMBO' || 'EASY') {
+      parsedData = this.ticketParser.parse(
+        createTicketDto.supermarket,
+        createTicketDto.rawTicketHTML,
+        createTicketDto.ogTicketUrl,
+      );
+    }
 
     const ticket = this.ticketsRepository.create({
       ...parsedData,
@@ -43,7 +47,7 @@ export class TicketsService {
 
     const potentialDuplicate = await this.ticketsRepository.findOne({
       where: {
-        ogTicketUrl: ticket.ogTicketUrl,
+        ogTicketUrl: createTicketDto.ogTicketUrl,
       },
     });
 
