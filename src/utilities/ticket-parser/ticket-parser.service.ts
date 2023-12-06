@@ -15,7 +15,7 @@ export class TicketParserService {
     ogTicketUrl: string,
   ): Ticket {
     switch (supermarket) {
-      case Supermarket.DISCO:
+      case Supermarket.DISCO || Supermarket.EASY || Supermarket.JUMBO:
         return this.discoParser.parse(htmlString, ogTicketUrl);
       // case Supermarket.COTO:
       //     return this.cotoParser.parse(htmlString);

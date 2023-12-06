@@ -29,15 +29,11 @@ export class TicketsService {
   }
 
   async createAndSave(createTicketDto: CreateTicketDto, user: string) {
-    let parsedData;
-
-    if (createTicketDto.supermarket === 'DISCO' || 'JUMBO' || 'EASY') {
-      parsedData = this.ticketParser.parse(
-        createTicketDto.supermarket,
-        createTicketDto.rawTicketHTML,
-        createTicketDto.ogTicketUrl,
-      );
-    }
+    const parsedData = this.ticketParser.parse(
+      createTicketDto.supermarket,
+      createTicketDto.rawTicketHTML,
+      createTicketDto.ogTicketUrl,
+    );
 
     const ticket = this.ticketsRepository.create({
       ...parsedData,
