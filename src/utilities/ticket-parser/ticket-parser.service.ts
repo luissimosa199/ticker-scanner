@@ -5,17 +5,22 @@ import { Ticket } from 'src/tickets/interfaces/ticket.interface';
 
 @Injectable()
 export class TicketParserService {
-  constructor(
-    private readonly discoParser: DiscoTicketParser, // ... inject other parsers as needed
-  ) {}
+  constructor(private readonly discoParser: DiscoTicketParser) {}
 
   parse(
     supermarket: Supermarket,
     htmlString: string,
     ogTicketUrl: string,
   ): Ticket {
+    console.log({
+      supermarket,
+    });
     switch (supermarket) {
-      case Supermarket.DISCO || Supermarket.EASY || Supermarket.JUMBO:
+      case 'EASY':
+        return this.discoParser.parse(htmlString, ogTicketUrl);
+      case 'DISCO':
+        return this.discoParser.parse(htmlString, ogTicketUrl);
+      case 'JUMBO':
         return this.discoParser.parse(htmlString, ogTicketUrl);
       // case Supermarket.COTO:
       //     return this.cotoParser.parse(htmlString);
