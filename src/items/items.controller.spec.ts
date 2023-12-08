@@ -29,9 +29,16 @@ describe('ItemsController', () => {
     it('should return items from the service', async () => {
       const mockItems = [];
 
+      const mockedRequest = {
+        user: { username: 'username@example.com' },
+      };
+
       jest.spyOn(itemsService, 'searchItems').mockResolvedValue(mockItems);
 
-      const result = await controller.searchItems('your-search-term');
+      const result = await controller.searchItems(
+        mockedRequest,
+        'your-search-term',
+      );
 
       expect(result).toEqual(mockItems);
     });

@@ -63,7 +63,7 @@ describe('ItemsService', () => {
           paymentMethod: 'Cencosud Mastercard 5281 Cts:01',
           ogTicketUrl:
             'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzYwXzZfMDE1NDA2MDAwNjMyMzEwMTgxNDEw',
-          user: 'luissimosaarg@gmail.com',
+          user: 'username@example.com',
           createdAt: new Date(),
           updatedAt: new Date(),
           supermarket: 'DISCO',
@@ -72,7 +72,10 @@ describe('ItemsService', () => {
 
       jest.spyOn(ticketsRepository, 'find').mockResolvedValue(mockTickets);
 
-      const result = await service.searchItems('filtro');
+      const result = await service.searchItems(
+        'filtro',
+        'username@example.com',
+      );
 
       expect(result).toHaveLength(mockTickets.length);
 

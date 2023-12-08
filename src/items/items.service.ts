@@ -11,7 +11,10 @@ export class ItemsService {
     private ticketsRepository: Repository<Ticket>,
   ) {}
 
-  async searchItems(term: string): Promise<ItemsSearchResult[]> {
+  async searchItems(
+    term: string,
+    username: string,
+  ): Promise<ItemsSearchResult[]> {
     const tickets = await (
       this.ticketsRepository as MongoRepository<Ticket>
     ).find({
@@ -19,6 +22,7 @@ export class ItemsService {
         'ticketItems.name': {
           $regex: new RegExp(term, 'i'),
         },
+        user: username,
       },
     });
 
