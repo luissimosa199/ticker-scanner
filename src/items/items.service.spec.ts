@@ -76,8 +76,6 @@ describe('ItemsService', () => {
 
       expect(result).toHaveLength(mockTickets.length);
 
-      console.log(result);
-
       expect(result[0]).toMatchObject({
         name: 'Filtro de café JUMBO Home Care N° 2.',
         quantity: 1,
