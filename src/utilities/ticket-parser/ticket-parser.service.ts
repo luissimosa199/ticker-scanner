@@ -12,9 +12,6 @@ export class TicketParserService {
     htmlString: string,
     ogTicketUrl: string,
   ): Ticket {
-    console.log({
-      supermarket,
-    });
     switch (supermarket) {
       case 'EASY':
         return this.discoParser.parse(htmlString, ogTicketUrl);
