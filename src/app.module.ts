@@ -7,6 +7,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ItemsModule } from './items/items.module';
+import { FetchHtmlController } from './fetch-html/fetch-html.controller';
+import { HttpModule } from '@nestjs/axios';
+import { FetchHtmlService } from './fetch-html/fetch-html.service';
 
 @Module({
   imports: [
@@ -26,8 +29,9 @@ import { ItemsModule } from './items/items.module';
     AuthModule,
     UsersModule,
     ItemsModule,
+    HttpModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, FetchHtmlController],
+  providers: [AppService, FetchHtmlService],
 })
 export class AppModule {}
