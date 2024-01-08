@@ -1,73 +1,276 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Ticket Scanner - Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este es el backend para la aplicación Ticket Scanner. Provee una API REST desarrollada con [NestJS](https://nestjs.com/).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Descripción
 
-## Description
+El backend expone endpoints para:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Autenticación y autorización de usuarios
+- Manejo de datos escaneados desde tickets
+- Generación de reportes y estadísticas
 
-## Installation
+## Utiliza:
 
-```bash
+- Base de datos MongoDB
+- JWT para manejo de sesiones  
+- Passport para autenticación
+- TypeORM para el mapeo de entidades a la DB
+
+## Instalación
+
+```
 $ npm install
 ```
 
-## Running the app
+## Ejecución 
 
-```bash
-# development
+```  
 $ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Test
+Esto levanta el servidor en `http://localhost:3001`.
 
-```bash
-# unit tests
+## Testing
+
+```
 $ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Support
+Ejecuta test unitarios con Jest.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Deploy
 
-## Stay in touch
+El proyecto incluye configuración para desplegar en un contenedor Docker.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Endpoints 
 
-## License
+### Autenticación
 
-Nest is [MIT licensed](LICENSE).
+```
+POST /auth/login
+```
+
+Inicia sesión y retorna un JWT token de acceso.  
+
+Parámetros:
+
+- `email`: Correo del usuario
+- `password`: Contraseña   
+
+Ejemplo:
+
+```json
+{
+ "email": "john@email.com",
+ "password": "1234"  
+}
+```
+
+### Verifica tu acceso  
+
+```
+GET /profile
+```
+
+Retorna los datos del usuario autenticado.
+
+Requiere JWT token en Authorization header.
+
+### Registro de usuario  
+
+```
+POST /auth/register    
+```
+
+Crea una nueva cuenta de usuario.  
+
+Parámetros:  
+
+- `name`: Nombre del usuario
+- `email`: Email (debe ser único)  
+- `password`: Contraseña
+
+Ejemplo:
+
+```json
+{
+  "name": "John Doe",
+  "email": "john@email.com",
+  "password": "1234"
+}
+```
+
+### Interfaces y objetos
+
+#### Ticket
+
+```
+Supermarket = 'DISCO' | 'JUMBO' | 'EASY'
+
+TicketItem {
+
+  name: string;
+  
+  quantity: number;
+  
+  price: number;
+  
+  total: number;
+  
+}
+
+Discounts {
+
+  disc_items: { desc_name: string, desc_amount: number }[];
+  
+  disc_total: number;
+  
+}
+
+Ticket {
+
+  logoLink: string;
+  
+  totalAmount: number;
+  
+  ticketItems: TicketItem[];
+  
+  address: string;
+  
+  date: string;
+  
+  discounts: Discounts;
+  
+  paymentMethod: string;
+   
+  ogTicketUrl: string;
+
+  supermarket: Supermarket;
+  
+  user?: string;
+  
+}
+```
+
+#### Usuario
+
+```
+User {
+
+  _id: string;
+
+  email: string;
+  
+  name: string;
+
+  password: string;
+  
+  image?: string;
+
+}
+```
+
+#### Item (resultado de la búsqueda de items)
+
+```
+ItemsSearchResult {
+
+  name: string;
+
+  quantity: number;
+
+  price: number;
+
+  total: number;
+
+  logoLink: string;
+
+  date: string;
+
+  ogTicketUrl: string;
+
+  supermarket: Supermarket;
+
+  ticketId: string;
+
+}
+
+```
+
+### Escaneo de tickets
+
+```
+POST /tickets
+```
+
+Crea un nuevo ticket escaneado.  
+
+Parámetros:   
+
+- `rawTicketHTML`: Texto HTML de la factura escaneada, el HTML debe ser solicitado en el cliente y enviado al servidor
+- `supermarket`: Nombre del supermercado en mayúsculas, actualmente se soporta "DISCO", "JUMBO" y "EASY"
+- `ogTicketUrl`: URL de la factura digital.
+
+Devuelve un objeto "Ticket" sin "user"
+
+```
+POST /tickets/save
+```
+
+Parámetros:   
+
+- `rawTicketHTML`: Texto HTML de la factura escaneada, el HTML debe ser solicitado en el cliente y enviado al servidor
+- `supermarket`: Nombre del supermercado en mayúsculas, actualmente se soporta "DISCO", "JUMBO" y "EASY"
+- `ogTicketUrl`: URL de la factura digital.
+- `user`: Email del usuario
+
+Crea y guarda un nuevo ticket escaneado asociado al usuario autenticado.  
+
+Requiere JWT token en Authorization header.
+
+### Obtener tickets  
+
+```
+GET /tickets  
+```
+
+Obtiene todos los tickets guardados del usuario autenticado.
+
+Requiere JWT token en Authorization header.
+
+```  
+GET /tickets/:id
+```
+
+Obtiene un ticket por su ID, debe pertenecer al usuario autenticado.  
+
+Requiere JWT token en Authorization header.
+
+### Eliminar ticket  
+
+```
+DELETE /tickets/:id  
+```
+
+Elimina un ticket por su ID, debe pertenecer al usuario autenticado. 
+
+Requiere JWT token en Authorization header.  
+
+### Búsqueda de productos  
+
+```
+GET /items?term=:keyword  
+```
+
+Busca productos en base a keyword, entre los tickets del usuario autenticado.  
+
+Requiere JWT token en Authorization header.
+
+------------------------------------------
+
+## Contribuciones
+
+Pull requests son bienvenidos. Para cambios mayores abrir un issue primero para discutir qué modificaciones realizar.  
+
+Por consultas o issues contactar a simosa37@gmail.com
