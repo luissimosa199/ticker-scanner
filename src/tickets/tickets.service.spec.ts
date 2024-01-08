@@ -13,6 +13,7 @@ import { ObjectId } from 'mongodb';
 import { parsedData } from './mocks/parsedData';
 import { sampleDto } from './mocks/sampleDto';
 import { TestableTicketsService } from './mocks/TestableTicketsService';
+import { CotoTicketParser } from 'src/utilities/ticket-parser/parsers/coto-ticket-parser.service';
 
 describe('TicketsService', () => {
   let service: TestableTicketsService;
@@ -31,6 +32,7 @@ describe('TicketsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DiscoTicketParser,
+        CotoTicketParser,
         TicketParserService,
         TestableTicketsService,
         {

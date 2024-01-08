@@ -2,7 +2,8 @@ export const parsedData = {
   _id: {
     $oid: '652dc2fb6ba1fade28ef8416',
   },
-  logoLink: 'https://media.easy.com.ar/is/image/EasyArg/logo_disco',
+  logoLink:
+    'https://res.cloudinary.com/ds2ujzebg/image/upload/v1704674554/logo_disco_tzjl49.png',
   totalAmount: 16049.03,
   ticketItems: [
     {

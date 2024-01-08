@@ -10,6 +10,7 @@ import { TicketsService } from './tickets.service';
 import { ObjectId } from 'mongodb';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { CotoTicketParser } from 'src/utilities/ticket-parser/parsers/coto-ticket-parser.service';
 
 describe('TicketsController', () => {
   let controller: TicketsController;
@@ -40,6 +41,7 @@ describe('TicketsController', () => {
       providers: [
         DiscoTicketParser,
         TicketParserService,
+        CotoTicketParser,
         {
           provide: TicketsService,
           useValue: {

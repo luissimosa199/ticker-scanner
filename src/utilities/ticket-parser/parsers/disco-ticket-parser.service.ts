@@ -4,10 +4,16 @@ import { Ticket } from 'src/tickets/interfaces/ticket.interface';
 import { SupermarketParser } from '../interfaces/supermarket-parser.interface';
 import { JSDOM } from 'jsdom';
 import { HtmlStructureError } from '../errors/html-structure.error';
+import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
+import { SupermarketLogoUtil } from 'src/utilities/supermarket-logo.util';
 
 @Injectable()
 export class DiscoTicketParser implements SupermarketParser {
-  parse(htmlString: string, ogTicketUrl: string): Ticket {
+  parse(
+    htmlString: string,
+    ogTicketUrl: string,
+    supermarket: Supermarket,
+  ): Ticket {
     const dom = new JSDOM(htmlString);
     const doc = dom.window.document;
 
@@ -85,7 +91,7 @@ export class DiscoTicketParser implements SupermarketParser {
     }
 
     // LOGO LINK
-    const logoLink = doc.querySelector('img')?.src || '';
+    const logoLink = SupermarketLogoUtil.getLogo(supermarket);
 
     // ADDRESS
     const addressElement = doc.querySelector('.company-header:nth-child(3)');

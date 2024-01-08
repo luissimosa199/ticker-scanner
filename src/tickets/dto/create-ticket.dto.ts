@@ -2,6 +2,8 @@ export enum Supermarket {
   DISCO = 'DISCO',
   JUMBO = 'JUMBO',
   EASY = 'EASY',
+  VEA = 'VEA',
+  COTO = 'COTO',
   // OTHER_SUPERMARKET = 'OTHER_SUPERMARKET',
 }
 

@@ -5,10 +5,16 @@ import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.s
 import { DiscoTicketParser } from 'src/utilities/ticket-parser/parsers/disco-ticket-parser.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Ticket } from './entities/ticket.entity';
+import { CotoTicketParser } from '../utilities/ticket-parser/parsers/coto-ticket-parser.service';
 
 @Module({
   controllers: [TicketsController],
   imports: [TypeOrmModule.forFeature([Ticket])],
-  providers: [DiscoTicketParser, TicketParserService, TicketsService],
+  providers: [
+    DiscoTicketParser,
+    CotoTicketParser,
+    TicketParserService,
+    TicketsService,
+  ],
 })
 export class TicketsModule {}

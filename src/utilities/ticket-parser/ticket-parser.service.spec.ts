@@ -5,13 +5,19 @@ import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
 import { parsedData } from 'src/tickets/mocks/parsedData';
 import { ObjectId } from 'mongodb';
+import { CotoTicketParser } from './parsers/coto-ticket-parser.service';
 
 describe('TicketParserService', () => {
   let service: TicketParserService;
   let discoParser: jest.Mocked<DiscoTicketParser>;
+  let cotoParser: jest.Mocked<CotoTicketParser>;
 
   beforeEach(async () => {
     const discoParserMock = {
+      parse: jest.fn(),
+    };
+
+    const cotoParserMock = {
       parse: jest.fn(),
     };
 
@@ -19,11 +25,13 @@ describe('TicketParserService', () => {
       providers: [
         TicketParserService,
         { provide: DiscoTicketParser, useValue: discoParserMock },
+        { provide: CotoTicketParser, useValue: cotoParserMock },
       ],
     }).compile();
 
     service = module.get<TicketParserService>(TicketParserService);
     discoParser = module.get(DiscoTicketParser);
+    cotoParser = module.get(CotoTicketParser);
   });
 
   it('should be defined', () => {
@@ -45,7 +53,11 @@ describe('TicketParserService', () => {
       'ogTicketUrl',
     );
     expect(result).toEqual(mockedTicket);
-    expect(discoParser.parse).toHaveBeenCalledWith('htmlString', 'ogTicketUrl');
+    expect(discoParser.parse).toHaveBeenCalledWith(
+      'htmlString',
+      'ogTicketUrl',
+      'DISCO',
+    );
   });
 
   it('should throw an error for unsupported supermarket', () => {

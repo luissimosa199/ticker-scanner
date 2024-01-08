@@ -4,6 +4,7 @@ import { DiscoTicketParser } from './disco-ticket-parser.service';
 import { HtmlStructureError } from '../errors/html-structure.error';
 import { htmlMock } from 'src/tickets/mocks/htmlMock';
 import { parsedData } from 'src/tickets/mocks/parsedData';
+import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
 
 describe('DiscoTicketParser', () => {
   let service: DiscoTicketParser;
@@ -28,7 +29,11 @@ describe('DiscoTicketParser', () => {
     it('should correctly parse the valid HTML structure', () => {
       const mockValidHtml = htmlMock;
 
-      const result = service.parse(mockValidHtml, ogTicketUrl);
+      const result = service.parse(
+        mockValidHtml,
+        ogTicketUrl,
+        Supermarket.DISCO,
+      );
 
       expect(result.ticketItems).toBeDefined();
       expect(result.totalAmount).toBeDefined();
@@ -50,9 +55,9 @@ describe('DiscoTicketParser', () => {
     it('should throw HtmlStructureError for invalid HTML structure', () => {
       const mockInvalidHtml = `<p>Invalid HTML</p>`;
 
-      expect(() => service.parse(mockInvalidHtml, ogTicketUrl)).toThrow(
-        HtmlStructureError,
-      );
+      expect(() =>
+        service.parse(mockInvalidHtml, ogTicketUrl, Supermarket.DISCO),
+      ).toThrow(HtmlStructureError);
     });
   });
 });
