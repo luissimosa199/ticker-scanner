@@ -19,6 +19,7 @@ export class CotoTicketParser implements SupermarketParser {
     const ticketItems = Array.from(doc.querySelectorAll('.product-li')).map(
       (item) => {
         const name = item.querySelector('.info-producto-h2').textContent.trim();
+
         const [quantityString, priceString] = item
           .querySelector('.info-cant')
           .textContent.split('x')
@@ -45,6 +46,10 @@ export class CotoTicketParser implements SupermarketParser {
       },
     );
 
+    if (!ticketItems.length) {
+      throw new HtmlStructureError("Couldn't find articles in the html.");
+    }
+
     const totalAmount = parseFloat(
       doc
         .querySelector('.info-total-border span.text-right')
@@ -52,13 +57,18 @@ export class CotoTicketParser implements SupermarketParser {
         .replace(',', '.'),
     );
 
+    if (!ticketItems.length) {
+      throw new HtmlStructureError("Couldn't find the total html.");
+    }
+
     const logoLink = SupermarketLogoUtil.getLogo(supermarket);
 
-    const address = doc.querySelector('.info-direccion').textContent;
+    const address = doc.querySelector('.info-direccion').textContent || '';
 
-    const date = doc
-      .querySelector('.info-ticket-main .text-big-grey.text-left')
-      .textContent.replace('Fecha: ', '');
+    const date =
+      doc
+        .querySelector('.info-ticket-main .text-big-grey.text-left')
+        .textContent.replace('Fecha: ', '') || '';
 
     const discountsSection = Array.from(doc.querySelectorAll('h2.second-title'))
       .find((h2) => h2.textContent.trim() === 'DETALLE DE OFERTAS APLICADAS')
@@ -81,9 +91,13 @@ export class CotoTicketParser implements SupermarketParser {
       doc.querySelectorAll('span.text-left'),
     ).find((span) => span.textContent.trim() === 'Ahorro por línea de cajas');
     const disc_span = discs_identifier.nextElementSibling;
-    const disc_span_text = parseFloat(
-      disc_span.textContent.replace('$', '').replace(',', '.').replace('-', ''),
-    );
+    const disc_span_text =
+      parseFloat(
+        disc_span.textContent
+          .replace('$', '')
+          .replace(',', '.')
+          .replace('-', ''),
+      ) || 0;
 
     const discounts = {
       disc_items: discountsItems,
@@ -99,17 +113,6 @@ export class CotoTicketParser implements SupermarketParser {
         'There has been an error parsing the the articles.',
       );
     }
-
-    console.log({
-      ticketItems,
-      totalAmount,
-      logoLink,
-      address,
-      date,
-      discounts,
-      paymentMethod,
-      ogTicketUrl,
-    });
 
     return {
       ticketItems,

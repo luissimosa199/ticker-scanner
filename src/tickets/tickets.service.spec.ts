@@ -65,16 +65,22 @@ describe('TicketsService', () => {
     const ticket = new Ticket();
     mockRepository.create.mockReturnValue(ticket);
 
-    mockRepository.findOne.mockResolvedValueOnce({
+    const existingTicket = {
       ogTicketUrl: sampleDto.ogTicketUrl,
-    });
+      _id: 'existingTicketId',
+    };
+    mockRepository.findOne.mockResolvedValueOnce(existingTicket);
 
     try {
       await service.createAndSave(sampleDto, 'test@email.com');
       fail('Expected ConflictException but none was thrown');
     } catch (err) {
       expect(err).toBeInstanceOf(ConflictException);
-      expect(err.message).toBe('Duplicate ticket');
+      expect(err.response).toEqual({
+        duplicate: true,
+        existingTicketId: existingTicket._id,
+        message: 'Duplicate ticket',
+      });
     }
   });
 

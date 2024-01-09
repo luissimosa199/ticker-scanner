@@ -48,7 +48,11 @@ export class TicketsService {
     });
 
     if (potentialDuplicate) {
-      throw new ConflictException('Duplicate ticket');
+      throw new ConflictException({
+        duplicate: true,
+        existingTicketId: potentialDuplicate._id,
+        message: 'Duplicate ticket',
+      });
     }
 
     return this.ticketsRepository.save(ticket);
