@@ -49,9 +49,10 @@ export class TicketsService {
 
     if (potentialDuplicate) {
       throw new ConflictException({
-        duplicate: true,
-        existingTicketId: potentialDuplicate._id,
-        message: 'Duplicate ticket',
+        message: JSON.stringify({
+          _id: potentialDuplicate._id,
+          message: 'Duplicated Ticket',
+        }),
       });
     }
 
