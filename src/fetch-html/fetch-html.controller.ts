@@ -7,7 +7,6 @@ export class FetchHtmlController {
 
   @Get()
   fetchHtml(@Query('url') url: string) {
-    console.log(url)
     return this.fetchHtmlService.fetchHtml(url);
   }
 }

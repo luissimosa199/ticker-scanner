@@ -26,6 +26,8 @@ export class FetchHtmlService {
       ),
     );
 
+    console.log(html);
+
     return html;
   }
 }
