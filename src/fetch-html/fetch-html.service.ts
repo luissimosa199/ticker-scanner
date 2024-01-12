@@ -14,9 +14,8 @@ export class FetchHtmlService {
       throw new BadRequestException('Invalid URL');
     }
 
-    return this.httpService.get(url, { responseType: 'text' }).pipe(
+    const html = this.httpService.get(url, { responseType: 'text' }).pipe(
       map((response: AxiosResponse<string>) => response.data),
-
       catchError((err: any) =>
         throwError(
           () =>
@@ -26,5 +25,7 @@ export class FetchHtmlService {
         ),
       ),
     );
+
+    return html;
   }
 }
