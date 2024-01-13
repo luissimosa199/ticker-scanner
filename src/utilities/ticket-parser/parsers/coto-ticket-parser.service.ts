@@ -70,39 +70,54 @@ export class CotoTicketParser implements SupermarketParser {
         .querySelector('.info-ticket-main .text-big-grey.text-left')
         .textContent.replace('Fecha: ', '') || '';
 
-    const discountsSection = Array.from(doc.querySelectorAll('h2.second-title'))
-      .find((h2) => h2.textContent.trim() === 'DETALLE DE OFERTAS APLICADAS')
-      .closest('.col-md-12.bg-grey');
+    console.log('1');
 
-    const discountDivs = discountsSection.querySelectorAll('div.info-total');
-    const discountsItems = Array.from(discountDivs).map((div) => {
-      const desc_name = div.querySelector('span.text-left').textContent;
-      const desc_amount = parseFloat(
-        div
-          .querySelector('span.text-right')
-          .textContent.replace('$', '')
-          .replace(',', '.')
-          .replace('-', ''),
-      );
-      return { desc_name, desc_amount };
-    });
+    //
 
-    const discs_identifier = Array.from(
-      doc.querySelectorAll('span.text-left'),
-    ).find((span) => span.textContent.trim() === 'Ahorro por línea de cajas');
-    const disc_span = discs_identifier.nextElementSibling;
-    const disc_span_text =
-      parseFloat(
-        disc_span.textContent
-          .replace('$', '')
-          .replace(',', '.')
-          .replace('-', ''),
-      ) || 0;
-
-    const discounts = {
-      disc_items: discountsItems,
-      disc_total: disc_span_text,
+    let discounts = {
+      disc_items: [],
+      disc_total: 0,
     };
+
+    const discountsSection = Array.from(
+      doc.querySelectorAll('h2.second-title') || null,
+    )
+      .find((h2) => h2.textContent.trim() === 'DETALLE DE OFERTAS APLICADAS')
+      ?.closest('.col-md-12.bg-grey');
+
+    if (discountsSection) {
+      const discountDivs = discountsSection.querySelectorAll('div.info-total');
+      const discountsItems = Array.from(discountDivs).map((div) => {
+        const desc_name = div.querySelector('span.text-left').textContent;
+        const desc_amount =
+          parseFloat(
+            (div.querySelector('span.text-right')?.textContent || '')
+              .replace('$', '')
+              .replace(',', '.')
+              .replace('-', ''),
+          ) || 0;
+        return { desc_name, desc_amount };
+      });
+
+      const discs_identifier = Array.from(
+        doc.querySelectorAll('span.text-left'),
+      ).find((span) => span.textContent.trim() === 'Ahorro por línea de cajas');
+      const disc_span = discs_identifier.nextElementSibling;
+      const disc_span_text =
+        parseFloat(
+          disc_span.textContent
+            .replace('$', '')
+            .replace(',', '.')
+            .replace('-', ''),
+        ) || 0;
+
+      discounts = {
+        disc_items: discountsItems,
+        disc_total: disc_span_text,
+      };
+    }
+
+    //
 
     const paymentMethod = doc.querySelector(
       '.info-total-gray .text-left',
@@ -114,7 +129,7 @@ export class CotoTicketParser implements SupermarketParser {
       );
     }
 
-    return {
+    const ticket = {
       ticketItems,
       totalAmount,
       logoLink,
@@ -124,5 +139,9 @@ export class CotoTicketParser implements SupermarketParser {
       paymentMethod,
       ogTicketUrl,
     };
+
+    console.log(ticket);
+
+    return ticket;
   }
 }

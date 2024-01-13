@@ -77,9 +77,10 @@ describe('TicketsService', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(ConflictException);
       expect(err.response).toEqual({
-        duplicate: true,
-        existingTicketId: existingTicket._id,
-        message: 'Duplicate ticket',
+        message: JSON.stringify({
+          _id: 'existingTicketId',
+          message: 'Duplicated Ticket',
+        }),
       });
     }
   });
