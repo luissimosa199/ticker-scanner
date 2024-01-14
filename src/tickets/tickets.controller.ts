@@ -32,7 +32,12 @@ export class TicketsController {
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll(@Request() req) {
-    return this.ticketsService.findAll(req.user.username);
+    let { page = 1, limit = 10 } = req.query;
+
+    page = Number(page);
+    limit = Number(limit);
+
+    return this.ticketsService.findAll(req.user.username, page, limit);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -59,13 +59,21 @@ export class TicketsService {
     return this.ticketsRepository.save(ticket);
   }
 
-  findAll(username: string) {
-    const tickets = this.ticketsRepository.find({
+  async findAll(username: string, page: number, limit: number) {
+    const [tickets, total] = await this.ticketsRepository.findAndCount({
       where: {
         user: username,
       },
+      skip: (page - 1) * limit,
+      take: limit,
     });
-    return tickets;
+
+    return {
+      tickets,
+      total,
+      page,
+      limit,
+    };
   }
 
   findOne(id: string, user: string) {

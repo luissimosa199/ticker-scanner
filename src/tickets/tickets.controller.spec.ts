@@ -34,6 +34,7 @@ describe('TicketsController', () => {
       createAndSave: jest.fn(),
       remove: jest.fn(),
       save: jest.fn(),
+      findAndCount: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -103,10 +104,23 @@ describe('TicketsController', () => {
   it('should find all tickets for a user (findAll method)', async () => {
     const tickets = [mockedTicket, mockedTicket];
     const user = 'test@example.com';
-    service.findAll.mockReturnValue(tickets);
-    expect(await controller.findAll({ user: { username: user } })).toEqual(
-      tickets,
-    );
+    const total = tickets.length;
+
+    // Adjust the mock to return an object instead of an array
+    service.findAll.mockResolvedValue({ tickets, total, page: 1, limit: 10 });
+
+    // Destructure the object returned by service.findAll
+    const {
+      tickets: resultTickets,
+      total: resultTotal,
+      page,
+      limit,
+    } = await controller.findAll({ user: { username: user }, query: {} });
+
+    expect(resultTickets).toEqual(tickets);
+    expect(resultTotal).toEqual(total);
+    expect(page).toEqual(1);
+    expect(limit).toEqual(10);
   });
 
   it('should find all tickets for a user (findOne method)', async () => {

@@ -26,6 +26,7 @@ describe('TicketsService', () => {
     createAndSave: jest.fn(),
     remove: jest.fn(),
     save: jest.fn(),
+    findAndCount: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -98,11 +99,17 @@ describe('TicketsService', () => {
   it('should return all tickets for a user (findAll method)', async () => {
     const user = 'luissimosaarg@gmail.com';
     const tickets = [new Ticket()];
+    const total = 1;
 
-    mockRepository.find.mockResolvedValue(tickets);
+    mockRepository.findAndCount.mockResolvedValue([tickets, total]);
 
-    const result = await service.findAll(user);
-    expect(result).toEqual(tickets);
+    const result = await service.findAll(user, 1, 10);
+    expect(result).toEqual({
+      tickets,
+      total,
+      page: 1,
+      limit: 10,
+    });
   });
 
   it('should return one ticket for a user (findOne method)', async () => {
