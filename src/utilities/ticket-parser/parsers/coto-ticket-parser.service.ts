@@ -10,13 +10,13 @@ import { SupermarketLogoUtil } from 'src/utilities/supermarket-logo.util';
 export class CotoTicketParser implements SupermarketParser {
   parse(
     htmlString: string,
-    ogTicketUrl: string,
+    og_ticket_url: string,
     supermarket: Supermarket,
   ): Ticket {
     const dom = new JSDOM(htmlString);
     const doc = dom.window.document;
 
-    const ticketItems = Array.from(doc.querySelectorAll('.product-li')).map(
+    const ticket_items = Array.from(doc.querySelectorAll('.product-li')).map(
       (item) => {
         const name = item.querySelector('.info-producto-h2').textContent.trim();
 
@@ -46,22 +46,22 @@ export class CotoTicketParser implements SupermarketParser {
       },
     );
 
-    if (!ticketItems.length) {
+    if (!ticket_items.length) {
       throw new HtmlStructureError("Couldn't find articles in the html.");
     }
 
-    const totalAmount = parseFloat(
+    const total_amount = parseFloat(
       doc
         .querySelector('.info-total-border span.text-right')
         .innerHTML.replace('$', '')
         .replace(',', '.'),
     );
 
-    if (!ticketItems.length) {
+    if (!ticket_items.length) {
       throw new HtmlStructureError("Couldn't find the total html.");
     }
 
-    const logoLink = SupermarketLogoUtil.getLogo(supermarket);
+    const logo_link = SupermarketLogoUtil.getLogo(supermarket);
 
     const address = doc.querySelector('.info-direccion').textContent || '';
 
@@ -69,10 +69,6 @@ export class CotoTicketParser implements SupermarketParser {
       doc
         .querySelector('.info-ticket-main .text-big-grey.text-left')
         .textContent.replace('Fecha: ', '') || '';
-
-    console.log('1');
-
-    //
 
     let discounts = {
       disc_items: [],
@@ -99,10 +95,10 @@ export class CotoTicketParser implements SupermarketParser {
         return { desc_name, desc_amount };
       });
 
-      const discs_identifier = Array.from(
+      const discsidentifier = Array.from(
         doc.querySelectorAll('span.text-left'),
       ).find((span) => span.textContent.trim() === 'Ahorro por línea de cajas');
-      const disc_span = discs_identifier.nextElementSibling;
+      const disc_span = discsidentifier.nextElementSibling;
       const disc_span_text =
         parseFloat(
           disc_span.textContent
@@ -119,28 +115,26 @@ export class CotoTicketParser implements SupermarketParser {
 
     //
 
-    const paymentMethod = doc.querySelector(
+    const payment_method = doc.querySelector(
       '.info-total-gray .text-left',
     ).textContent;
 
-    if (!ticketItems.length) {
+    if (!ticket_items.length) {
       throw new HtmlStructureError(
         'There has been an error parsing the the articles.',
       );
     }
 
     const ticket = {
-      ticketItems,
-      totalAmount,
-      logoLink,
+      ticket_items,
+      total_amount,
+      logo_link,
       address,
       date,
       discounts,
-      paymentMethod,
-      ogTicketUrl,
+      payment_method,
+      og_ticket_url,
     };
-
-    console.log(ticket);
 
     return ticket;
   }

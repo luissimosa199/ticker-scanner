@@ -1,10 +1,10 @@
-import { Column, Entity, ObjectIdColumn } from 'typeorm';
-import { ObjectId } from 'mongodb';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity('users')
 export class User {
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryColumn('uuid')
+  id: string;
 
   @Column()
   email: string;
@@ -17,4 +17,9 @@ export class User {
 
   @Column()
   image?: string;
+
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv4();
+  }
 }

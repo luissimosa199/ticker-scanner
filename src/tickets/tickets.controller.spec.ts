@@ -66,7 +66,7 @@ describe('TicketsController', () => {
 
   const mockedTicket: Ticket = {
     ...parsedData,
-    _id: new ObjectId(),
+    id: new ObjectId(),
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -128,7 +128,7 @@ describe('TicketsController', () => {
     const id = new ObjectId().toHexString();
     const ticket = {
       ...mockedTicket,
-      _id: id,
+      id: id,
     };
 
     service.findOne.mockReturnValue(ticket);
@@ -151,7 +151,7 @@ describe('TicketsController', () => {
     const id = 'someObjectId';
     const ticket = {
       ...mockedTicket,
-      _id: id,
+      id: id,
     };
 
     service.remove.mockResolvedValue(ticket);

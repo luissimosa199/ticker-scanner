@@ -23,7 +23,7 @@ describe('DiscoTicketParser', () => {
 
   describe('parse', () => {
     // Mocked URL for testing purposes
-    const ogTicketUrl =
+    const og_ticket_url =
       'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzVfNl8wMTU0MDA1MDE5OTIzMTAxMTIwMDA=';
 
     it('should correctly parse the valid HTML structure', () => {
@@ -31,18 +31,18 @@ describe('DiscoTicketParser', () => {
 
       const result = service.parse(
         mockValidHtml,
-        ogTicketUrl,
+        og_ticket_url,
         Supermarket.DISCO,
       );
 
-      expect(result.ticketItems).toBeDefined();
-      expect(result.totalAmount).toBeDefined();
+      expect(result.ticket_items).toBeDefined();
+      expect(result.total_amount).toBeDefined();
 
       const {
-        _id,
-        user,
-        createdAt,
-        updatedAt,
+        id,
+        user_email,
+        created_at,
+        updated_at,
         supermarket,
         ...mockedParsedData
       } = parsedData;
@@ -56,7 +56,7 @@ describe('DiscoTicketParser', () => {
       const mockInvalidHtml = `<p>Invalid HTML</p>`;
 
       expect(() =>
-        service.parse(mockInvalidHtml, ogTicketUrl, Supermarket.DISCO),
+        service.parse(mockInvalidHtml, og_ticket_url, Supermarket.DISCO),
       ).toThrow(HtmlStructureError);
     });
   });

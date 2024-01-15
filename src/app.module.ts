@@ -18,9 +18,8 @@ import { FetchHtmlService } from './fetch-html/fetch-html.service';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'mongodb',
-        url: configService.get<string>('MONGODB_URI'),
-        database: 'test',
+        type: 'postgres',
+        url: configService.get<string>('PG_URI'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: process.env.NODE_ENV === 'production' ? false : true,
       }),

@@ -68,7 +68,7 @@ describe('TicketsService', () => {
 
     const existingTicket = {
       ogTicketUrl: sampleDto.ogTicketUrl,
-      _id: 'existingTicketId',
+      id: 'existingTicketId',
     };
     mockRepository.findOne.mockResolvedValueOnce(existingTicket);
 
@@ -79,7 +79,7 @@ describe('TicketsService', () => {
       expect(err).toBeInstanceOf(ConflictException);
       expect(err.response).toEqual({
         message: JSON.stringify({
-          _id: 'existingTicketId',
+          id: 'existingTicketId',
           message: 'Duplicated Ticket',
         }),
       });

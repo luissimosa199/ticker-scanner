@@ -3,9 +3,9 @@ export interface ItemsSearchResult {
   quantity: number;
   price: number;
   total: number;
-  logoLink: string;
+  logo_link: string;
   date: string;
-  ogTicketUrl: string;
+  og_ticket_url: string;
   supermarket: string;
   ticketId: string;
 }

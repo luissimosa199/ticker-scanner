@@ -41,7 +41,7 @@ describe('TicketParserService', () => {
   it('should use DiscoTicketParser for DISCO supermarket', () => {
     const mockedTicket: Ticket = {
       ...parsedData,
-      _id: new ObjectId(),
+      id: new ObjectId(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };

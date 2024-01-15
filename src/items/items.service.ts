@@ -19,7 +19,7 @@ export class ItemsService {
       this.ticketsRepository as MongoRepository<Ticket>
     ).find({
       where: {
-        'ticketItems.name': {
+        'ticket_items.name': {
           $regex: new RegExp(term, 'i'),
         },
         user: username,
@@ -28,7 +28,7 @@ export class ItemsService {
 
     const formattedTickets = tickets
       .map((ticket) => {
-        const matchingItem = ticket.ticketItems.find((item) =>
+        const matchingItem = ticket.ticket_items.find((item) =>
           item.name.toLowerCase().includes(term.toLowerCase()),
         );
 
@@ -38,11 +38,11 @@ export class ItemsService {
             quantity: matchingItem.quantity,
             price: matchingItem.price,
             total: matchingItem.total,
-            logoLink: ticket.logoLink,
+            logo_link: ticket.logo_link,
             date: ticket.date,
-            ogTicketUrl: ticket.ogTicketUrl,
+            og_ticket_url: ticket.og_ticket_url,
             supermarket: ticket.supermarket,
-            ticketId: ticket._id.toString(),
+            ticketId: ticket.id.toString(),
           };
         } else {
           return null;

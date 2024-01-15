@@ -1,5 +1,5 @@
 export const expectedTicketMock = {
-  _id: {
+  id: {
     $oid: '652dc2fb6ba1fade28ef8416',
   },
   logoLink: 'https://media.easy.com.ar/is/image/EasyArg/logo_disco',

@@ -158,7 +158,7 @@ Ticket {
 ```
 User {
 
-  _id: string;
+  id: string;
 
   email: string;
   

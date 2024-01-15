@@ -11,13 +11,13 @@ export interface Discounts {
 }
 
 export interface Ticket {
-  logoLink: string;
-  totalAmount: number;
-  ticketItems: TicketItem[];
+  logo_link: string;
+  total_amount: number;
+  ticket_items: TicketItem[];
   address: string;
   date: string;
   discounts: Discounts;
-  paymentMethod: string;
-  ogTicketUrl: string;
+  payment_method: string;
+  og_ticket_url: string;
   user?: string;
 }

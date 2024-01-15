@@ -8,7 +8,6 @@ import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.s
 import { Ticket } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class TicketsService {
@@ -22,35 +21,35 @@ export class TicketsService {
     const parsedData = this.ticketParser.parse(
       createTicketDto.supermarket,
       createTicketDto.rawTicketHTML,
-      createTicketDto.ogTicketUrl,
+      createTicketDto.og_ticket_url,
     );
 
     return { ...parsedData, supermarket: createTicketDto.supermarket };
   }
 
-  async createAndSave(createTicketDto: CreateTicketDto, user: string) {
+  async createAndSave(createTicketDto: CreateTicketDto, user_email: string) {
     const parsedData = this.ticketParser.parse(
       createTicketDto.supermarket,
       createTicketDto.rawTicketHTML,
-      createTicketDto.ogTicketUrl,
+      createTicketDto.og_ticket_url,
     );
 
     const ticket = this.ticketsRepository.create({
       ...parsedData,
-      user,
+      user_email,
       supermarket: createTicketDto.supermarket,
     });
 
     const potentialDuplicate = await this.ticketsRepository.findOne({
       where: {
-        ogTicketUrl: createTicketDto.ogTicketUrl,
+        og_ticket_url: createTicketDto.og_ticket_url,
       },
     });
 
     if (potentialDuplicate) {
       throw new ConflictException({
         message: JSON.stringify({
-          _id: potentialDuplicate._id,
+          id: potentialDuplicate.id,
           message: 'Duplicated Ticket',
         }),
       });
@@ -62,12 +61,12 @@ export class TicketsService {
   async findAll(username: string, page: number, limit: number) {
     const [tickets, total] = await this.ticketsRepository.findAndCount({
       where: {
-        user: username,
+        user_email: username,
       },
       skip: (page - 1) * limit,
       take: limit,
       order: {
-        createdAt: 'DESC',
+        created_at: 'DESC',
       },
     });
 
@@ -79,19 +78,19 @@ export class TicketsService {
     };
   }
 
-  findOne(id: string, user: string) {
+  findOne(id: string, user_email: string) {
     const ticket = this.ticketsRepository.findOne({
       where: {
-        _id: new ObjectId(id),
-        user: user,
+        id,
+        user_email,
       },
     });
 
     return ticket;
   }
 
-  async remove(id: string, user: string) {
-    const ticket = await this.findOne(id, user);
+  async remove(id: string, user_email: string) {
+    const ticket = await this.findOne(id, user_email);
     if (!ticket) {
       throw new NotFoundException(
         `Ticket #${id} not found or doesn't belong to user`,

@@ -11,7 +11,7 @@ import { SupermarketLogoUtil } from 'src/utilities/supermarket-logo.util';
 export class DiscoTicketParser implements SupermarketParser {
   parse(
     htmlString: string,
-    ogTicketUrl: string,
+    og_ticket_url: string,
     supermarket: Supermarket,
   ): Ticket {
     const dom = new JSDOM(htmlString);
@@ -33,44 +33,46 @@ export class DiscoTicketParser implements SupermarketParser {
     }
 
     // TICKET ITEMS
-    const ticketItems: Ticket['ticketItems'] = Array.from(articles).map((e) => {
-      const name =
-        e.querySelector('td>div:nth-child(1)')?.textContent?.trim() || '';
+    const ticket_items: Ticket['ticket_items'] = Array.from(articles).map(
+      (e) => {
+        const name =
+          e.querySelector('td>div:nth-child(1)')?.textContent?.trim() || '';
 
-      const quantity = parseFloat(
-        (
-          e
-            .querySelector('td:nth-child(2)>div:nth-child(1)')
-            ?.textContent?.trim() || ''
-        ).replace(/,/g, '.'),
-      );
+        const quantity = parseFloat(
+          (
+            e
+              .querySelector('td:nth-child(2)>div:nth-child(1)')
+              ?.textContent?.trim() || ''
+          ).replace(/,/g, '.'),
+        );
 
-      const price = parseFloat(
-        (
-          e
-            .querySelector('td:nth-child(3)>div:nth-child(1)')
-            ?.textContent?.trim() || ''
-        )
-          .replace(/[^0-9.,]+/g, '')
-          .replace('.', '')
-          .replace(',', '.'),
-      );
+        const price = parseFloat(
+          (
+            e
+              .querySelector('td:nth-child(3)>div:nth-child(1)')
+              ?.textContent?.trim() || ''
+          )
+            .replace(/[^0-9.,]+/g, '')
+            .replace('.', '')
+            .replace(',', '.'),
+        );
 
-      const total = parseFloat(
-        (
-          e
-            .querySelector('td:nth-child(4)>div:nth-child(1)')
-            ?.textContent?.trim() || ''
-        )
-          .replace(/[^0-9.,]+/g, '')
-          .replace('.', '')
-          .replace(',', '.'),
-      );
+        const total = parseFloat(
+          (
+            e
+              .querySelector('td:nth-child(4)>div:nth-child(1)')
+              ?.textContent?.trim() || ''
+          )
+            .replace(/[^0-9.,]+/g, '')
+            .replace('.', '')
+            .replace(',', '.'),
+        );
 
-      return { name, quantity, price, total };
-    });
+        return { name, quantity, price, total };
+      },
+    );
 
-    if (!ticketItems.length) {
+    if (!ticket_items.length) {
       throw new HtmlStructureError(
         'There has been an error parsing the the articles.',
       );
@@ -82,16 +84,16 @@ export class DiscoTicketParser implements SupermarketParser {
     );
 
     const totalAmountString = totalAmountElements[1]?.textContent?.trim() || '';
-    const totalAmount = parseNumberString(totalAmountString);
+    const total_amount = parseNumberString(totalAmountString);
 
-    if (!totalAmount) {
+    if (!total_amount) {
       throw new HtmlStructureError(
         'There has been an error parsing the total amount of the ticket.',
       );
     }
 
     // LOGO LINK
-    const logoLink = SupermarketLogoUtil.getLogo(supermarket);
+    const logo_link = SupermarketLogoUtil.getLogo(supermarket);
 
     // ADDRESS
     const addressElement = doc.querySelector('.company-header:nth-child(3)');
@@ -140,7 +142,7 @@ export class DiscoTicketParser implements SupermarketParser {
 
     // PAYMENT_METHOD
 
-    const paymentMethod =
+    const payment_method =
       doc
         .querySelector(
           'body > table > tbody > tr:nth-child(13) > td > table > tbody > tr:nth-child(1) > td:nth-child(1) > div',
@@ -148,14 +150,14 @@ export class DiscoTicketParser implements SupermarketParser {
         .textContent.trim() || 'Payment Method not recognized';
 
     return {
-      ticketItems,
-      totalAmount,
-      logoLink,
+      ticket_items,
+      total_amount,
+      logo_link,
       address,
       date,
       discounts,
-      paymentMethod,
-      ogTicketUrl,
+      payment_method,
+      og_ticket_url,
     };
   }
 }

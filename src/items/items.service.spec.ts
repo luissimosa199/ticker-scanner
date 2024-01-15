@@ -32,7 +32,7 @@ describe('ItemsService', () => {
 
       const mockTickets = [
         {
-          _id: mockedId,
+          id: mockedId,
           logoLink: 'https://media.easy.com.ar/is/image/EasyArg/logo_disco',
           totalAmount: 924.72,
           ticketItems: [

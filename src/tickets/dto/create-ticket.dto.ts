@@ -9,7 +9,7 @@ export enum Supermarket {
 
 export class CreateTicketDto {
   rawTicketHTML: string;
-  ogTicketUrl: string;
+  og_ticket_url: string;
   supermarket: Supermarket;
-  user?: string;
+  user_email?: string;
 }

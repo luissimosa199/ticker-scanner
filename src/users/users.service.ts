@@ -19,7 +19,7 @@ export class UsersService {
 
   async createOne(
     createUserDto: CreateUserDto,
-  ): Promise<Omit<User, '_id' | 'password'> | undefined> {
+  ): Promise<Omit<User, 'id' | 'password'> | undefined> {
     const userData = {
       email: createUserDto.email,
       name: createUserDto.name,
@@ -33,12 +33,12 @@ export class UsersService {
 
   private transformUser(
     user: User | undefined,
-  ): Omit<User, '_id' | 'password'> | undefined {
+  ): Omit<User, 'id' | 'password'> | undefined {
     if (!user) {
       return undefined;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { _id, password, ...rest } = user;
+    const { id, password, ...rest } = user as User & { generateId: () => void };
     return rest;
   }
 
