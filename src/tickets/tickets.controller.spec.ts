@@ -5,9 +5,8 @@ import { TicketsController } from './tickets.controller';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
 import { DiscoTicketParser } from 'src/utilities/ticket-parser/parsers/disco-ticket-parser.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Ticket } from './entities/ticket.entity';
+import { Discount, Ticket } from './entities/ticket.entity';
 import { TicketsService } from './tickets.service';
-import { ObjectId } from 'mongodb';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { CotoTicketParser } from 'src/utilities/ticket-parser/parsers/coto-ticket-parser.service';
@@ -66,9 +65,23 @@ describe('TicketsController', () => {
 
   const mockedTicket: Ticket = {
     ...parsedData,
-    id: new ObjectId(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
+    created_at: new Date(),
+    updated_at: new Date(),
+    discount: new Discount(),
+    generateId: function (): void {
+      throw new Error('Function not implemented.');
+    },
+    ticket_items: parsedData.ticket_items.map((item, index) => ({
+      ...item,
+      name: 'some-name',
+      price: 100,
+      quantity: 1,
+      total: 100,
+      id: index,
+      ticket_id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
+      ticket: new Ticket(),
+    })),
   };
 
   it('should be defined', () => {
@@ -125,7 +138,7 @@ describe('TicketsController', () => {
 
   it('should find all tickets for a user (findOne method)', async () => {
     const username = 'luissimosaarg@gmail.com';
-    const id = new ObjectId().toHexString();
+    const id = 'c755548e-c622-4f09-8446-80af4a4cdf54';
     const ticket = {
       ...mockedTicket,
       id: id,
@@ -139,7 +152,7 @@ describe('TicketsController', () => {
 
   it('should return null when no ticket is found (findOne method)', async () => {
     const username = 'luissimosaarg@gmail.com';
-    const id = new ObjectId().toHexString();
+    const id = 'c755548e-c622-4f09-8446-80af4a4cdf54';
 
     service.findOne.mockResolvedValue(null);
     expect(await controller.findOne({ user: { username } }, id)).toBeNull();

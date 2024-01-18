@@ -1,5 +1,5 @@
 export const parsedData = {
-  id: '652dc2fb6ba1fade28ef8416',
+  id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
   logo_link:
     'https://res.cloudinary.com/ds2ujzebg/image/upload/v1704674554/logo_disco_tzjl49.png',
   total_amount: 16049.03,
@@ -79,7 +79,7 @@ export const parsedData = {
   ],
   address: 'Intendente Garcia Silva 855',
   date: '11/10/2023',
-  discounts: {
+  discount: {
     disc_items: [
       {
         desc_name: 'OI_10%_PATAGONIA 1 Litros',

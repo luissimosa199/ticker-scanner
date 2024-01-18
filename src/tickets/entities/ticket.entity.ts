@@ -6,8 +6,10 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,18 +22,21 @@ export class TicketItem {
   @Column()
   name: string;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', precision: 10, scale: 3 })
   quantity: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   total: number;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.ticket_items) // Adjust the property name
-  @JoinColumn({ name: 'ticket_id' }) // Use the correct column name
-  ticket: Ticket; // Change the type from function to the actual type
+  @Column({ type: 'uuid' })
+  ticket_id: string;
+
+  @ManyToOne(() => Ticket, (ticket) => ticket.ticket_items)
+  @JoinColumn({ name: 'ticket_id' })
+  ticket: Relation<Ticket>;
 }
 
 @Entity('discounts')
@@ -42,11 +47,11 @@ export class Discount {
   @Column()
   desc_name: string;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   desc_amount: number;
 
-  @OneToMany(() => Ticket, (ticket) => ticket.discount)
-  tickets: () => Ticket[];
+  @OneToOne(() => Ticket, (ticket) => ticket.discount)
+  ticket: Relation<Ticket[]>;
 }
 
 @Entity('tickets')
@@ -57,15 +62,15 @@ export class Ticket {
   @Column()
   logo_link: string;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   total_amount: number;
 
   @OneToMany(() => TicketItem, (ticketItem) => ticketItem.ticket)
-  ticket_items: TicketItem[];
+  ticket_items: Relation<TicketItem[]>;
 
-  @ManyToOne(() => Discount, (discount) => discount.tickets)
-  @JoinColumn({ name: 'discount_id' })
-  discount: () => Discount;
+  @OneToOne(() => Discount, (discount) => discount.ticket)
+  @JoinColumn({ name: 'id' })
+  discount: Relation<Discount>;
 
   @Column()
   address: string;

@@ -9,7 +9,6 @@ import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.s
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Ticket } from './entities/ticket.entity';
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 import { parsedData } from './mocks/parsedData';
 import { sampleDto } from './mocks/sampleDto';
 import { TestableTicketsService } from './mocks/TestableTicketsService';
@@ -67,7 +66,7 @@ describe('TicketsService', () => {
     mockRepository.create.mockReturnValue(ticket);
 
     const existingTicket = {
-      ogTicketUrl: sampleDto.ogTicketUrl,
+      og_ticket_url: sampleDto.og_ticket_url,
       id: 'existingTicketId',
     };
     mockRepository.findOne.mockResolvedValueOnce(existingTicket);
@@ -114,7 +113,7 @@ describe('TicketsService', () => {
 
   it('should return one ticket for a user (findOne method)', async () => {
     const user = 'luissimosaarg@gmail.com';
-    const id = new ObjectId().toHexString();
+    const id = 'c755548e-c622-4f09-8446-80af4a4cdf54';
     const ticket = new Ticket();
 
     mockRepository.findOne.mockResolvedValue(ticket);
@@ -125,7 +124,7 @@ describe('TicketsService', () => {
 
   it('should return null when no ticket is found (findOne method)', async () => {
     const user = 'luissimosaarg@gmail.com';
-    const id = new ObjectId().toHexString();
+    const id = 'c755548e-c622-4f09-8446-80af4a4cdf54';
 
     mockRepository.findOne.mockResolvedValue(null);
     const result = await service.findOne(id, user);

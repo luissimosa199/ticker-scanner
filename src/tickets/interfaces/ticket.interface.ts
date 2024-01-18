@@ -5,19 +5,28 @@ export interface TicketItem {
   total: number;
 }
 
+export interface DiscountItem {
+  desc_name: string;
+  desc_amount: number;
+}
+
 export interface Discounts {
-  disc_items: { desc_name: string; desc_amount: number }[];
+  disc_items: DiscountItem[];
   disc_total: number;
 }
 
 export interface Ticket {
+  id: string;
   logo_link: string;
   total_amount: number;
   ticket_items: TicketItem[];
   address: string;
   date: string;
-  discounts: Discounts;
+  discount: Discounts;
   payment_method: string;
   og_ticket_url: string;
-  user?: string;
+  user_email: string;
+  supermarket: string;
+  created_at: string;
+  updated_at: string;
 }

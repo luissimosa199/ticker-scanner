@@ -13,7 +13,10 @@ export class DiscoTicketParser implements SupermarketParser {
     htmlString: string,
     og_ticket_url: string,
     supermarket: Supermarket,
-  ): Ticket {
+  ): Omit<
+    Ticket,
+    'id' | 'user_email' | 'supermarket' | 'created_at' | 'updated_at'
+  > {
     const dom = new JSDOM(htmlString);
     const doc = dom.window.document;
 
@@ -135,7 +138,7 @@ export class DiscoTicketParser implements SupermarketParser {
       }
     }
 
-    const discounts = {
+    const discount = {
       disc_items,
       disc_total,
     };
@@ -155,7 +158,7 @@ export class DiscoTicketParser implements SupermarketParser {
       logo_link,
       address,
       date,
-      discounts,
+      discount,
       payment_method,
       og_ticket_url,
     };

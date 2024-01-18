@@ -1,10 +1,9 @@
-export const expectedTicketMock = {
-  id: {
-    $oid: '652dc2fb6ba1fade28ef8416',
-  },
-  logoLink: 'https://media.easy.com.ar/is/image/EasyArg/logo_disco',
-  totalAmount: 16049.03,
-  ticketItems: [
+export const expectedTicketMockp = {
+  id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
+  logo_link:
+    'https://res.cloudinary.com/ds2ujzebg/image/upload/v1704674554/logo_disco_tzjl49.png',
+  total_amount: 16049.03,
+  ticket_items: [
     {
       name: 'Chocolate MILKA Milk',
       quantity: 1,
@@ -80,7 +79,7 @@ export const expectedTicketMock = {
   ],
   address: 'Intendente Garcia Silva 855',
   date: '11/10/2023',
-  discounts: {
+  discount: {
     disc_items: [
       {
         desc_name: 'OI_10%_PATAGONIA 1 Litros',
@@ -93,15 +92,11 @@ export const expectedTicketMock = {
     ],
     disc_total: 677.53,
   },
-  paymentMethod: 'Naranja 2497 Cts:11',
-  ogTicketUrl:
+  payment_method: 'Naranja 2497 Cts:11',
+  og_ticket_url:
     'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzVfNl8wMTU0MDA1MDE5OTIzMTAxMTIwMDA=',
-  user: 'luissimosaarg@gmail.com',
+  user_email: 'luissimosaarg@gmail.com',
   supermarket: 'DISCO',
-  createdAt: {
-    $date: '2023-10-16T23:10:51.557Z',
-  },
-  updatedAt: {
-    $date: '2023-10-16T23:10:51.557Z',
-  },
+  created_at: '2023-10-16T23:10:51.557Z',
+  updated_at: '2023-10-16T23:10:51.557Z',
 };

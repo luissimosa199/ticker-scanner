@@ -13,7 +13,7 @@ El backend expone endpoints para:
 ## Utiliza:
 
 - Base de datos MongoDB
-- JWT para manejo de sesiones  
+- JWT para manejo de sesiones
 - Passport para autenticación
 - TypeORM para el mapeo de entidades a la DB
 
@@ -23,9 +23,9 @@ El backend expone endpoints para:
 $ npm install
 ```
 
-## Ejecución 
+## Ejecución
 
-```  
+```
 $ npm run start
 ```
 
@@ -43,7 +43,7 @@ Ejecuta test unitarios con Jest.
 
 El proyecto incluye configuración para desplegar en un contenedor Docker.
 
-## Endpoints 
+## Endpoints
 
 ### Autenticación
 
@@ -51,23 +51,23 @@ El proyecto incluye configuración para desplegar en un contenedor Docker.
 POST /auth/login
 ```
 
-Inicia sesión y retorna un JWT token de acceso.  
+Inicia sesión y retorna un JWT token de acceso.
 
 Parámetros:
 
 - `email`: Correo del usuario
-- `password`: Contraseña   
+- `password`: Contraseña
 
 Ejemplo:
 
 ```json
 {
- "email": "john@email.com",
- "password": "1234"  
+  "email": "john@email.com",
+  "password": "1234"
 }
 ```
 
-### Verifica tu acceso  
+### Verifica tu acceso
 
 ```
 GET /profile
@@ -77,18 +77,18 @@ Retorna los datos del usuario autenticado.
 
 Requiere JWT token en Authorization header.
 
-### Registro de usuario  
+### Registro de usuario
 
 ```
-POST /auth/register    
+POST /auth/register
 ```
 
-Crea una nueva cuenta de usuario.  
+Crea una nueva cuenta de usuario.
 
-Parámetros:  
+Parámetros:
 
 - `name`: Nombre del usuario
-- `email`: Email (debe ser único)  
+- `email`: Email (debe ser único)
 - `password`: Contraseña
 
 Ejemplo:
@@ -111,45 +111,45 @@ Supermarket = 'DISCO' | 'JUMBO' | 'EASY'
 TicketItem {
 
   name: string;
-  
+
   quantity: number;
-  
+
   price: number;
-  
+
   total: number;
-  
+
 }
 
 Discounts {
 
   disc_items: { desc_name: string, desc_amount: number }[];
-  
+
   disc_total: number;
-  
+
 }
 
 Ticket {
 
   logoLink: string;
-  
+
   totalAmount: number;
-  
+
   ticketItems: TicketItem[];
-  
+
   address: string;
-  
+
   date: string;
-  
+
   discounts: Discounts;
-  
+
   paymentMethod: string;
-   
-  ogTicketUrl: string;
+
+  og_ticket_url: string;
 
   supermarket: Supermarket;
-  
+
   user?: string;
-  
+
 }
 ```
 
@@ -161,11 +161,11 @@ User {
   id: string;
 
   email: string;
-  
+
   name: string;
 
   password: string;
-  
+
   image?: string;
 
 }
@@ -188,7 +188,7 @@ ItemsSearchResult {
 
   date: string;
 
-  ogTicketUrl: string;
+  og_ticket_url: string;
 
   supermarket: Supermarket;
 
@@ -204,13 +204,13 @@ ItemsSearchResult {
 POST /tickets
 ```
 
-Crea un nuevo ticket escaneado.  
+Crea un nuevo ticket escaneado.
 
-Parámetros:   
+Parámetros:
 
 - `rawTicketHTML`: Texto HTML de la factura escaneada, el HTML debe ser solicitado en el cliente y enviado al servidor
 - `supermarket`: Nombre del supermercado en mayúsculas, actualmente se soporta "DISCO", "JUMBO" y "EASY"
-- `ogTicketUrl`: URL de la factura digital.
+- `og_ticket_url`: URL de la factura digital.
 
 Devuelve un objeto "Ticket" sin "user"
 
@@ -218,59 +218,59 @@ Devuelve un objeto "Ticket" sin "user"
 POST /tickets/save
 ```
 
-Parámetros:   
+Parámetros:
 
 - `rawTicketHTML`: Texto HTML de la factura escaneada, el HTML debe ser solicitado en el cliente y enviado al servidor
 - `supermarket`: Nombre del supermercado en mayúsculas, actualmente se soporta "DISCO", "JUMBO" y "EASY"
-- `ogTicketUrl`: URL de la factura digital.
+- `og_ticket_url`: URL de la factura digital.
 - `user`: Email del usuario
 
-Crea y guarda un nuevo ticket escaneado asociado al usuario autenticado.  
+Crea y guarda un nuevo ticket escaneado asociado al usuario autenticado.
 
 Requiere JWT token en Authorization header.
 
-### Obtener tickets  
+### Obtener tickets
 
 ```
-GET /tickets  
+GET /tickets
 ```
 
 Obtiene todos los tickets guardados del usuario autenticado.
 
 Requiere JWT token en Authorization header.
 
-```  
+```
 GET /tickets/:id
 ```
 
-Obtiene un ticket por su ID, debe pertenecer al usuario autenticado.  
+Obtiene un ticket por su ID, debe pertenecer al usuario autenticado.
 
 Requiere JWT token en Authorization header.
 
-### Eliminar ticket  
+### Eliminar ticket
 
 ```
-DELETE /tickets/:id  
+DELETE /tickets/:id
 ```
 
-Elimina un ticket por su ID, debe pertenecer al usuario autenticado. 
-
-Requiere JWT token en Authorization header.  
-
-### Búsqueda de productos  
-
-```
-GET /items?term=:keyword  
-```
-
-Busca productos en base a keyword, entre los tickets del usuario autenticado.  
+Elimina un ticket por su ID, debe pertenecer al usuario autenticado.
 
 Requiere JWT token en Authorization header.
 
-------------------------------------------
+### Búsqueda de productos
+
+```
+GET /items?term=:keyword
+```
+
+Busca productos en base a keyword, entre los tickets del usuario autenticado.
+
+Requiere JWT token en Authorization header.
+
+---
 
 ## Contribuciones
 
-Pull requests son bienvenidos. Para cambios mayores abrir un issue primero para discutir qué modificaciones realizar.  
+Pull requests son bienvenidos. Para cambios mayores abrir un issue primero para discutir qué modificaciones realizar.
 
 Por consultas o issues contactar a simosa37@gmail.com

@@ -41,9 +41,9 @@ describe('DiscoTicketParser', () => {
       const {
         id,
         user_email,
+        supermarket,
         created_at,
         updated_at,
-        supermarket,
         ...mockedParsedData
       } = parsedData;
 

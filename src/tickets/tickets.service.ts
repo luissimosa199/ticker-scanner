@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
-import { Ticket } from './entities/ticket.entity';
+import { Discount, Ticket } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 
 @Injectable()
 export class TicketsService {
@@ -38,6 +38,7 @@ export class TicketsService {
       ...parsedData,
       user_email,
       supermarket: createTicketDto.supermarket,
+      discount: parsedData.discount as DeepPartial<Discount>,
     });
 
     const potentialDuplicate = await this.ticketsRepository.findOne({

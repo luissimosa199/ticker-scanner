@@ -12,7 +12,10 @@ export class CotoTicketParser implements SupermarketParser {
     htmlString: string,
     og_ticket_url: string,
     supermarket: Supermarket,
-  ): Ticket {
+  ): Omit<
+    Ticket,
+    'id' | 'user_email' | 'supermarket' | 'created_at' | 'updated_at'
+  > {
     const dom = new JSDOM(htmlString);
     const doc = dom.window.document;
 
@@ -70,7 +73,7 @@ export class CotoTicketParser implements SupermarketParser {
         .querySelector('.info-ticket-main .text-big-grey.text-left')
         .textContent.replace('Fecha: ', '') || '';
 
-    let discounts = {
+    let discount = {
       disc_items: [],
       disc_total: 0,
     };
@@ -107,7 +110,7 @@ export class CotoTicketParser implements SupermarketParser {
             .replace('-', ''),
         ) || 0;
 
-      discounts = {
+      discount = {
         disc_items: discountsItems,
         disc_total: disc_span_text,
       };
@@ -131,7 +134,7 @@ export class CotoTicketParser implements SupermarketParser {
       logo_link,
       address,
       date,
-      discounts,
+      discount,
       payment_method,
       og_ticket_url,
     };

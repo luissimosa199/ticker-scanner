@@ -1,16 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { TicketParserService } from './ticket-parser.service';
 import { DiscoTicketParser } from './parsers/disco-ticket-parser.service';
-import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
 import { parsedData } from 'src/tickets/mocks/parsedData';
-import { ObjectId } from 'mongodb';
 import { CotoTicketParser } from './parsers/coto-ticket-parser.service';
+import { Ticket } from 'src/tickets/interfaces/ticket.interface';
 
 describe('TicketParserService', () => {
   let service: TicketParserService;
   let discoParser: jest.Mocked<DiscoTicketParser>;
-  let cotoParser: jest.Mocked<CotoTicketParser>;
+  // let cotoParser: jest.Mocked<CotoTicketParser>;
 
   beforeEach(async () => {
     const discoParserMock = {
@@ -31,7 +31,7 @@ describe('TicketParserService', () => {
 
     service = module.get<TicketParserService>(TicketParserService);
     discoParser = module.get(DiscoTicketParser);
-    cotoParser = module.get(CotoTicketParser);
+    // cotoParser = module.get(CotoTicketParser);
   });
 
   it('should be defined', () => {
@@ -39,30 +39,33 @@ describe('TicketParserService', () => {
   });
 
   it('should use DiscoTicketParser for DISCO supermarket', () => {
-    const mockedTicket: Ticket = {
-      ...parsedData,
-      id: new ObjectId(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const {
+      id,
+      user_email,
+      created_at,
+      updated_at,
+      supermarket,
+      ...mockedTicket
+    } = parsedData;
+
     discoParser.parse.mockReturnValue(mockedTicket);
 
     const result = service.parse(
       Supermarket.DISCO,
       'htmlString',
-      'ogTicketUrl',
+      'og_ticket_url',
     );
     expect(result).toEqual(mockedTicket);
     expect(discoParser.parse).toHaveBeenCalledWith(
       'htmlString',
-      'ogTicketUrl',
+      'og_ticket_url',
       'DISCO',
     );
   });
 
   it('should throw an error for unsupported supermarket', () => {
     expect(() => {
-      service.parse('UNSUPPORTED' as any, 'htmlString', 'ogTicketUrl');
+      service.parse('UNSUPPORTED' as any, 'htmlString', 'og_ticket_url');
     }).toThrowError('Unsupported supermarket: UNSUPPORTED');
   });
 });

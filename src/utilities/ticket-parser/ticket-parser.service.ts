@@ -14,17 +14,20 @@ export class TicketParserService {
   parse(
     supermarket: Supermarket,
     htmlString: string,
-    ogTicketUrl: string,
-  ): Ticket {
+    og_ticket_url: string,
+  ): Omit<
+    Ticket,
+    'id' | 'user_email' | 'supermarket' | 'created_at' | 'updated_at'
+  > {
     switch (supermarket) {
       case 'EASY':
-        return this.discoParser.parse(htmlString, ogTicketUrl, supermarket);
+        return this.discoParser.parse(htmlString, og_ticket_url, supermarket);
       case 'DISCO':
-        return this.discoParser.parse(htmlString, ogTicketUrl, supermarket);
+        return this.discoParser.parse(htmlString, og_ticket_url, supermarket);
       case 'JUMBO':
-        return this.discoParser.parse(htmlString, ogTicketUrl, supermarket);
+        return this.discoParser.parse(htmlString, og_ticket_url, supermarket);
       case 'COTO':
-        return this.cotoParser.parse(htmlString, ogTicketUrl, supermarket);
+        return this.cotoParser.parse(htmlString, og_ticket_url, supermarket);
       default:
         throw new Error(`Unsupported supermarket: ${supermarket}`);
     }
