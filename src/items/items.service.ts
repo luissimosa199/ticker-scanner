@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
-import { MongoRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ItemsSearchResult } from './interfaces/itemsSearchResult';
 
 @Injectable()
@@ -15,19 +15,19 @@ export class ItemsService {
     term: string,
     username: string,
   ): Promise<ItemsSearchResult[]> {
-    const tickets = await (
-      this.ticketsRepository as MongoRepository<Ticket>
-    ).find({
-      where: {
-        'ticket_items.name': {
-          $regex: new RegExp(term, 'i'),
-        },
-        user: username,
-      },
-    });
+    const tickets = await this.ticketsRepository
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.ticket_items', 'ticket_item')
+      .where('ticket_item.name ILIKE :term', { term: `%${term}%` })
+      .andWhere('ticket.user_email = :username', { username: username })
+      .getMany();
 
     const formattedTickets = tickets
       .map((ticket) => {
+        if (!ticket.ticket_items) {
+          return null;
+        }
+
         const matchingItem = ticket.ticket_items.find((item) =>
           item.name.toLowerCase().includes(term.toLowerCase()),
         );
@@ -35,20 +35,20 @@ export class ItemsService {
         if (matchingItem) {
           return {
             name: matchingItem.name,
-            quantity: matchingItem.quantity,
-            price: matchingItem.price,
-            total: matchingItem.total,
+            quantity: Math.round(Number(matchingItem.quantity)),
+            price: parseFloat(parseFloat(`${matchingItem.price}`).toFixed(2)),
+            total: parseFloat(parseFloat(`${matchingItem.total}`).toFixed(2)),
             logo_link: ticket.logo_link,
             date: ticket.date,
             og_ticket_url: ticket.og_ticket_url,
             supermarket: ticket.supermarket,
-            ticketId: ticket.id.toString(),
-          };
+            ticketId: ticket.id,
+          } as ItemsSearchResult;
         } else {
           return null;
         }
       })
-      .filter(Boolean);
+      .filter((item): item is ItemsSearchResult => item !== null);
 
     return formattedTickets;
   }

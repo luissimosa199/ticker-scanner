@@ -7,8 +7,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DiscoTicketParser } from 'src/utilities/ticket-parser/parsers/disco-ticket-parser.service';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Ticket } from './entities/ticket.entity';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { Discount, Ticket, TicketItem } from './entities/ticket.entity';
+import {
+  ConflictException,
+  HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { parsedData } from './mocks/parsedData';
 import { sampleDto } from './mocks/sampleDto';
 import { TestableTicketsService } from './mocks/TestableTicketsService';
@@ -37,6 +42,14 @@ describe('TicketsService', () => {
         TestableTicketsService,
         {
           provide: getRepositoryToken(Ticket),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Discount),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(TicketItem),
           useValue: mockRepository,
         },
       ],
@@ -96,19 +109,71 @@ describe('TicketsService', () => {
   });
 
   it('should return all tickets for a user (findAll method)', async () => {
+    // Arrange
     const user = 'luissimosaarg@gmail.com';
-    const tickets = [new Ticket()];
-    const total = 1;
+    const page = 1;
+    const limit = 10;
+    const tickets = [
+      { id: 1, user_email: user, created_at: new Date() },
+      // Add more ticket data as needed
+    ];
+    const ticketItems = [
+      {
+        id: 1,
+        ticket_id: 1,
+        name: 'Item 1',
+        quantity: 1,
+        price: 10,
+        total: 10,
+      },
+    ];
+    const discounts = [
+      { id: 1, ticket_id: 1, desc_name: 'Discount 1', desc_amount: 5 },
+    ];
+    const expectedResult = {
+      tickets: [
+        {
+          id: 1,
+          user_email: user,
+          created_at: expect.any(Date),
+          ticket_items: [
+            {
+              id: 1,
+              ticket_id: 1,
+              name: 'Item 1',
+              quantity: 1,
+              price: 10,
+              total: 10,
+            },
+          ],
+          discount: {
+            disc_items: [
+              {
+                id: 1,
+                ticket_id: 1,
+                desc_name: 'Discount 1',
+                desc_amount: 5,
+              },
+            ],
+            disc_total: 5,
+          },
+        },
+      ],
+      total: 32,
+      page,
+      limit,
+    };
 
-    mockRepository.findAndCount.mockResolvedValue([tickets, total]);
+    // Mocking repository responses
+    mockRepository.find.mockResolvedValueOnce(tickets);
+    mockRepository.find.mockResolvedValueOnce(ticketItems);
+    mockRepository.find.mockResolvedValueOnce(discounts);
 
-    const result = await service.findAll(user, 1, 10);
-    expect(result).toEqual({
-      tickets,
-      total,
-      page: 1,
-      limit: 10,
-    });
+    // Act
+    const result = await service.findAll(user, page, limit);
+
+    // Assert
+    expect(result).toEqual(expectedResult);
   });
 
   it('should return one ticket for a user (findOne method)', async () => {
@@ -120,6 +185,34 @@ describe('TicketsService', () => {
 
     const result = await service.findOne(id, user);
     expect(result).toEqual(ticket);
+  });
+
+  it('should return a response with status 204 and message when no tickets are found', async () => {
+    const user = 'luissimosaarg@gmail.com';
+    const page = 1;
+    const limit = 10;
+    const expectedResult = {
+      message: 'This user has no tickets yet.',
+      status: HttpStatus.NO_CONTENT,
+    };
+
+    mockRepository.find.mockResolvedValue([]);
+
+    const result = await service.findAll(user, page, limit);
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should throw InternalServerErrorException when an error occurs', async () => {
+    const user = 'luissimosaarg@gmail.com';
+    const page = 1;
+    const limit = 10;
+
+    mockRepository.find.mockRejectedValue(new Error('Mocked error'));
+
+    await expect(service.findAll(user, page, limit)).rejects.toThrowError(
+      InternalServerErrorException,
+    );
   });
 
   it('should return null when no ticket is found (findOne method)', async () => {

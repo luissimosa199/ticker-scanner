@@ -1,100 +1,71 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ItemsService } from './items.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ItemsService } from './items.service';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+
+const mockedResult = [
+  {
+    name: 'Pilas DURACELL aaa',
+    quantity: 1,
+    price: 2183,
+    total: 2183,
+    logo_link:
+      'https://res.cloudinary.com/ds2ujzebg/image/upload/v1704674554/logo_disco_tzjl49.png',
+    date: '2024-01-09T03:00:00.000Z',
+    og_ticket_url:
+      'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzhfNl8wMTU0MDA4MDI1NTI0MDEwOTIwNDA=',
+    supermarket: 'DISCO',
+    ticketId: 'd790cd88-f586-4c4a-b69d-32478198f4c3',
+  },
+];
+
+class MockQueryBuilder {
+  leftJoinAndSelect = jest.fn().mockReturnThis();
+  where = jest.fn().mockReturnThis();
+  andWhere = jest.fn().mockReturnThis();
+  getMany = jest.fn().mockImplementation(() => mockedResult);
+}
 
 describe('ItemsService', () => {
   let service: ItemsService;
-  let ticketsRepository: Repository<Ticket>;
+  let mockQueryBuilder: MockQueryBuilder;
+  let mockTicketsRepository: Partial<Repository<Ticket>>;
 
   beforeEach(async () => {
+    mockQueryBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockImplementation(() => mockedResult),
+    };
+
+    mockTicketsRepository = {
+      createQueryBuilder: jest.fn(() => mockQueryBuilder as any),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ItemsService,
         {
           provide: getRepositoryToken(Ticket),
-          useClass: Repository,
+          useValue: mockTicketsRepository,
         },
       ],
     }).compile();
 
     service = module.get<ItemsService>(ItemsService);
-    ticketsRepository = module.get<Repository<Ticket>>(
-      getRepositoryToken(Ticket),
-    );
   });
 
-  // describe('searchItems', () => {
-  //   it('should return formatted items', async () => {
-  //     const mockTickets = [
-  //       {
-  //         id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
-  //         logo_link: 'https://media.easy.com.ar/is/image/EasyArg/logo_disco',
-  //         total_amount: 924.72,
-  //         ticket_items: [
-  //           {
-  //             id: 1,
-  //             ticket_id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
-  //             ticket: new Ticket(),
-  //             name: 'Filtro de café JUMBO Home Care N° 2.',
-  //             quantity: 1,
-  //             price: 1115,
-  //             total: 1115,
-  //           },
-  //           {
-  //             id: 2,
-  //             ticket_id: 'c755548e-c622-4f09-8446-80af4a4cdf54',
-  //             ticket: new Ticket(),
-  //             name: 'Pastillas TIC TAC menta',
-  //             quantity: 1,
-  //             price: 144.22,
-  //             total: 144.22,
-  //           },
-  //         ],
-  //         address: 'Intendente Garcia Silva 855',
-  //         date: '18/10/2023',
-  //         discount: {
-  //           disc_items: [
-  //             {
-  //               desc_name: 'VI_R 30%_Art nonfood JDV',
-  //               desc_amount: 334.5,
-  //             },
-  //           ],
-  //           disc_total: 334.5,
-  //         },
-  //         payment_method: 'Cencosud Mastercard 5281 Cts:01',
-  //         og_ticket_url:
-  //           'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzYwXzZfMDE1NDA2MDAwNjMyMzEwMTgxNDEw',
-  //         user: 'username@example.com',
-  //         created_at: new Date(),
-  //         updated_at: new Date(),
-  //         supermarket: 'DISCO',
-  //         generateId: () => {},
-  //       },
-  //     ];
+  it('should return an array of ItemsSearchResult', async () => {
+    const term = 'pila';
+    const username = 'example@gmail.com';
 
-  //     jest.spyOn(ticketsRepository, 'find').mockResolvedValue(mockTickets);
+    const result = await service.searchItems(term, username);
 
-  //     const result = await service.searchItems(
-  //       'filtro',
-  //       'username@example.com',
-  //     );
+    expect(result).toBeInstanceOf(Array);
+    // Add more assertions to validate the structure and content of the result
+  });
 
-  //     expect(result).toHaveLength(mockTickets.length);
-
-  //     expect(result[0]).toMatchObject({
-  //       name: 'Filtro de café JUMBO Home Care N° 2.',
-  //       quantity: 1,
-  //       price: 1115,
-  //       total: 1115,
-  //       logoLink: 'https://media.easy.com.ar/is/image/EasyArg/logo_disco',
-  //       date: '18/10/2023',
-  //       og_ticket_url:
-  //         'https://mifactura.napse.global/mf/pq1rt7/Y2VuY29zdWRfMTU0XzYwXzZfMDE1NDA2MDAwNjMyMzEwMTgxNDEw',
-  //       supermarket: 'DISCO',
-  //       ticketId: 'c755548e-c622-4f09-8446-80af4a4cdf54',
-  //     });
-  //   });
-  // });
+  // Additional test cases...
 });

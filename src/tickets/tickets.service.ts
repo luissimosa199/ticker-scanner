@@ -1,11 +1,13 @@
 import {
   ConflictException,
+  HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.service';
-import { Discount, Ticket } from './entities/ticket.entity';
+import { Discount, Ticket, TicketItem } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 
@@ -15,6 +17,10 @@ export class TicketsService {
     protected readonly ticketParser: TicketParserService,
     @InjectRepository(Ticket)
     private ticketsRepository: Repository<Ticket>,
+    @InjectRepository(TicketItem)
+    private ticketItemRepository: Repository<TicketItem>,
+    @InjectRepository(Discount)
+    private discountRepository: Repository<Discount>,
   ) {}
 
   create(createTicketDto: CreateTicketDto) {
@@ -60,23 +66,104 @@ export class TicketsService {
   }
 
   async findAll(username: string, page: number, limit: number) {
-    const [tickets, total] = await this.ticketsRepository.findAndCount({
-      where: {
-        user_email: username,
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        created_at: 'DESC',
-      },
-    });
+    try {
+      const rawTicket = await this.ticketsRepository.find({
+        where: {
+          user_email: username,
+        },
+        order: {
+          created_at: 'DESC',
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
 
-    return {
-      tickets,
-      total,
-      page,
-      limit,
-    };
+      if (!rawTicket || rawTicket.length === 0) {
+        if (!rawTicket || rawTicket.length === 0) {
+          return {
+            message: 'This user has no tickets yet.',
+            status: HttpStatus.NO_CONTENT,
+          };
+        }
+      }
+
+      const ticketItemPromises = rawTicket.map(async (ticket) => {
+        const ticketItems = await this.ticketItemRepository.find({
+          where: {
+            ticket_id: ticket.id,
+          },
+          select: ['id', 'name', 'quantity', 'price', 'total'],
+        });
+
+        const ticketItemsAsNumbers = ticketItems.map((item) => ({
+          ...item,
+          quantity: Number(item.quantity),
+          price: parseFloat(parseFloat(`${item.price}`).toFixed(2)),
+          total: parseFloat(parseFloat(`${item.total}`).toFixed(2)),
+        }));
+
+        return {
+          ...ticket,
+          ticket_items: ticketItemsAsNumbers,
+        };
+      });
+
+      const discountPromises = rawTicket.map(async (ticket) => {
+        const discount = await this.discountRepository.find({
+          where: {
+            ticket_id: ticket.id,
+          },
+          select: ['id', 'desc_name', 'desc_amount'],
+        });
+
+        const discountAsNumbers = discount.map((item) => ({
+          ...item,
+          desc_amount: parseFloat(parseFloat(`${item.desc_amount}`).toFixed(2)),
+        }));
+
+        return {
+          ...ticket,
+          discount: discountAsNumbers || [],
+        };
+      });
+
+      const ticketItemsAndDiscounts = await Promise.all([
+        Promise.all(ticketItemPromises),
+        Promise.all(discountPromises),
+      ]);
+
+      const tickets = ticketItemsAndDiscounts[0].map((ticket) => {
+        const correspondingDiscount = ticketItemsAndDiscounts[1].find(
+          (discount) => discount.id === ticket.id,
+        );
+
+        const finalTicket = {
+          ...ticket,
+          discount: {
+            disc_items: correspondingDiscount
+              ? correspondingDiscount.discount
+              : [],
+            disc_total: correspondingDiscount
+              ? correspondingDiscount.discount.reduce(
+                  (sum, discount) => sum + Number(discount.desc_amount),
+                  0,
+                )
+              : 0,
+          },
+        };
+
+        return finalTicket;
+      });
+
+      return {
+        tickets,
+        total: 32,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Error retrieving tickets.');
+    }
   }
 
   findOne(id: string, user_email: string) {

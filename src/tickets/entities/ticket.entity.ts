@@ -6,7 +6,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   Relation,
@@ -39,6 +38,7 @@ export class TicketItem {
   ticket: Relation<Ticket>;
 }
 
+// revisar
 @Entity('discounts')
 export class Discount {
   @PrimaryGeneratedColumn()
@@ -50,8 +50,12 @@ export class Discount {
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   desc_amount: number;
 
-  @OneToOne(() => Ticket, (ticket) => ticket.discount)
-  ticket: Relation<Ticket[]>;
+  @Column({ type: 'uuid' })
+  ticket_id: string;
+
+  @ManyToOne(() => Ticket, (ticket) => ticket.discount)
+  @JoinColumn({ name: 'id' })
+  ticket: Relation<Ticket>;
 }
 
 @Entity('tickets')
@@ -68,7 +72,7 @@ export class Ticket {
   @OneToMany(() => TicketItem, (ticketItem) => ticketItem.ticket)
   ticket_items: Relation<TicketItem[]>;
 
-  @OneToOne(() => Discount, (discount) => discount.ticket)
+  @OneToMany(() => Discount, (discount) => discount.ticket)
   @JoinColumn({ name: 'id' })
   discount: Relation<Discount>;
 
