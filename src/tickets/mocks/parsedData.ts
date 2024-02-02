@@ -78,7 +78,7 @@ export const parsedData = {
     },
   ],
   address: 'Intendente Garcia Silva 855',
-  date: '11/10/2023',
+  date: '2023-10-11T00:00:00.000Z',
   discount: {
     disc_items: [
       {

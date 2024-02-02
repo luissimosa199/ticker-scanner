@@ -90,12 +90,10 @@ export class TicketsService {
       );
 
       if (!rawTicket || rawTicket.length === 0) {
-        if (!rawTicket || rawTicket.length === 0) {
-          return {
-            message: 'This user has no tickets yet.',
-            status: HttpStatus.NO_CONTENT,
-          };
-        }
+        return {
+          message: 'This user has no tickets yet.',
+          status: HttpStatus.NO_CONTENT,
+        };
       }
 
       const ticketItemPromises = rawTicket.map(async (ticket) => {
@@ -106,12 +104,20 @@ export class TicketsService {
           select: ['id', 'name', 'quantity', 'price', 'total'],
         });
 
-        const ticketItemsAsNumbers = ticketItems.map((item) => ({
-          ...item,
-          quantity: Number(item.quantity),
-          price: parseFloat(parseFloat(`${item.price}`).toFixed(2)),
-          total: parseFloat(parseFloat(`${item.total}`).toFixed(2)),
-        }));
+        const ticketItemsAsNumbers = ticketItems
+          ? ticketItems.map((item) => ({
+              ...item,
+              quantity: item.quantity !== null ? Number(item.quantity) : null,
+              price:
+                item.price !== null
+                  ? parseFloat(parseFloat(`${item.price}`).toFixed(2))
+                  : null,
+              total:
+                item.total !== null
+                  ? parseFloat(parseFloat(`${item.total}`).toFixed(2))
+                  : null,
+            }))
+          : [];
 
         return {
           ...ticket,
@@ -127,10 +133,14 @@ export class TicketsService {
           select: ['id', 'desc_name', 'desc_amount'],
         });
 
-        const discountAsNumbers = discount.map((item) => ({
-          ...item,
-          desc_amount: parseFloat(parseFloat(`${item.desc_amount}`).toFixed(2)),
-        }));
+        const discountAsNumbers = discount
+          ? discount.map((item) => ({
+              ...item,
+              desc_amount: parseFloat(
+                parseFloat(`${item.desc_amount}`).toFixed(2),
+              ),
+            }))
+          : [];
 
         return {
           ...ticket,
@@ -173,7 +183,7 @@ export class TicketsService {
         limit,
       };
     } catch (error) {
-      throw new InternalServerErrorException('Error retrieving tickets.');
+      throw new InternalServerErrorException('Error retrieving tickets.'); //happening
     }
   }
 

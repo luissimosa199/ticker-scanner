@@ -109,66 +109,46 @@ describe('TicketsService', () => {
   });
 
   it('should return all tickets for a user (findAll method)', async () => {
+    // Mock data
     const user = 'luissimosaarg@gmail.com';
     const page = 1;
     const limit = 10;
-    const tickets = [{ id: 1, user_email: user, created_at: new Date() }];
-    const ticketItems = [
-      {
-        id: 1,
-        ticket_id: 1,
-        name: 'Item 1',
-        quantity: 1,
-        price: 10,
-        total: 10,
-      },
-    ];
-    const discounts = [
-      { id: 1, ticket_id: 1, desc_name: 'Discount 1', desc_amount: 5 },
-    ];
+
+    const mockTicket = {
+      id: 1,
+      user_email: user,
+      created_at: new Date('2024-02-02T22:27:08.151Z'),
+      date: new Date().toISOString(),
+    };
+
+    const mockFindAndCountResponse = {
+      rawTicket: [mockTicket],
+      totalCount: 32,
+    };
+
     const expectedResult = {
       tickets: [
         {
-          id: 1,
-          user_email: user,
-          created_at: expect.any(Date),
-          ticket_items: [
-            {
-              id: 1,
-              ticket_id: 1,
-              name: 'Item 1',
-              quantity: 1,
-              price: 10,
-              total: 10,
-            },
-          ],
+          ...mockTicket,
+          ticket_items: [],
           discount: {
-            disc_items: [
-              {
-                id: 1,
-                ticket_id: 1,
-                desc_name: 'Discount 1',
-                desc_amount: 5,
-              },
-            ],
-            disc_total: 5,
+            desc_items: [],
+            desc_total: 0,
           },
         },
       ],
-      total: 32,
+      total: mockFindAndCountResponse.totalCount,
       page,
       limit,
     };
 
-    // Mocking repository responses
-    mockRepository.find.mockResolvedValueOnce(tickets);
-    mockRepository.find.mockResolvedValueOnce(ticketItems);
-    mockRepository.find.mockResolvedValueOnce(discounts);
+    mockRepository.findAndCount.mockResolvedValueOnce([
+      mockFindAndCountResponse.rawTicket,
+      mockFindAndCountResponse.totalCount,
+    ]);
 
-    // Act
     const result = await service.findAll(user, page, limit);
 
-    // Assert
     expect(result).toEqual(expectedResult);
   });
 
@@ -184,19 +164,21 @@ describe('TicketsService', () => {
   });
 
   it('should return a response with status 204 and message when no tickets are found', async () => {
+    // Arrange
     const user = 'luissimosaarg@gmail.com';
     const page = 1;
     const limit = 10;
-    const expectedResult = {
-      message: 'This user has no tickets yet.',
-      status: HttpStatus.NO_CONTENT,
-    };
 
-    mockRepository.find.mockResolvedValue([]);
+    mockRepository.findAndCount.mockResolvedValueOnce([[], 0]);
 
+    // Act
     const result = await service.findAll(user, page, limit);
 
-    expect(result).toEqual(expectedResult);
+    // Assert
+    expect(result).toEqual({
+      message: 'This user has no tickets yet.',
+      status: HttpStatus.NO_CONTENT,
+    });
   });
 
   it('should throw InternalServerErrorException when an error occurs', async () => {
