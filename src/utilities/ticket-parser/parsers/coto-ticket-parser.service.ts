@@ -68,10 +68,12 @@ export class CotoTicketParser implements SupermarketParser {
 
     const address = doc.querySelector('.info-direccion').textContent || '';
 
-    const date =
+    const dateStr =
       doc
         .querySelector('.info-ticket-main .text-big-grey.text-left')
         .textContent.replace('Fecha: ', '') || '';
+
+    const date = new Date(dateStr.split('/').reverse().join('-')).toISOString();
 
     let discount = {
       disc_items: [],

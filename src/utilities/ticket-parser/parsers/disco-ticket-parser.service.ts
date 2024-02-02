@@ -109,7 +109,8 @@ export class DiscoTicketParser implements SupermarketParser {
     );
     const emisionText = emisionElement?.textContent?.trim() || null;
 
-    const date = emisionText ? emisionText.split(':')[1].trim() : '';
+    const dateStr = emisionText ? emisionText.split(':')[1].trim() : '';
+    const date = new Date(dateStr.split('/').reverse().join('-')).toISOString();
 
     // DISCOUNTS
     const discountsTable = doc.querySelector('table.table-discounts');

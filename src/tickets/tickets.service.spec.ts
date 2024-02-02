@@ -109,14 +109,10 @@ describe('TicketsService', () => {
   });
 
   it('should return all tickets for a user (findAll method)', async () => {
-    // Arrange
     const user = 'luissimosaarg@gmail.com';
     const page = 1;
     const limit = 10;
-    const tickets = [
-      { id: 1, user_email: user, created_at: new Date() },
-      // Add more ticket data as needed
-    ];
+    const tickets = [{ id: 1, user_email: user, created_at: new Date() }];
     const ticketItems = [
       {
         id: 1,

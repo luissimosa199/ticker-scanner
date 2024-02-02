@@ -40,13 +40,6 @@ export class TicketsService {
       createTicketDto.og_ticket_url,
     );
 
-    const ticket = this.ticketsRepository.create({
-      ...parsedData,
-      user_email,
-      supermarket: createTicketDto.supermarket,
-      discount: parsedData.discount as DeepPartial<Discount>,
-    });
-
     const potentialDuplicate = await this.ticketsRepository.findOne({
       where: {
         og_ticket_url: createTicketDto.og_ticket_url,
@@ -62,21 +55,39 @@ export class TicketsService {
       });
     }
 
-    return this.ticketsRepository.save(ticket);
+    const ticket = this.ticketsRepository.create({
+      ...parsedData,
+      user_email,
+      supermarket: createTicketDto.supermarket,
+      discount: parsedData.discount as DeepPartial<Discount>,
+    });
+
+    try {
+      const savedTicket = await this.createTicketAndRelatedData(
+        ticket,
+        parsedData.discount,
+      );
+
+      return { ...savedTicket, discount: parsedData.discount };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async findAll(username: string, page: number, limit: number) {
     try {
-      const rawTicket = await this.ticketsRepository.find({
-        where: {
-          user_email: username,
+      const [rawTicket, totalCount] = await this.ticketsRepository.findAndCount(
+        {
+          where: {
+            user_email: username,
+          },
+          order: {
+            created_at: 'DESC',
+          },
+          skip: (page - 1) * limit,
+          take: limit,
         },
-        order: {
-          created_at: 'DESC',
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-      });
+      );
 
       if (!rawTicket || rawTicket.length === 0) {
         if (!rawTicket || rawTicket.length === 0) {
@@ -140,10 +151,10 @@ export class TicketsService {
         const finalTicket = {
           ...ticket,
           discount: {
-            disc_items: correspondingDiscount
+            desc_items: correspondingDiscount
               ? correspondingDiscount.discount
               : [],
-            disc_total: correspondingDiscount
+            desc_total: correspondingDiscount
               ? correspondingDiscount.discount.reduce(
                   (sum, discount) => sum + Number(discount.desc_amount),
                   0,
@@ -157,7 +168,7 @@ export class TicketsService {
 
       return {
         tickets,
-        total: 32,
+        total: totalCount,
         page,
         limit,
       };
@@ -185,5 +196,59 @@ export class TicketsService {
       );
     }
     return this.ticketsRepository.remove(ticket);
+  }
+
+  async createTicketAndRelatedData(
+    ticketData: Ticket,
+    discount: { disc_items: { desc_name: string; desc_amount: number }[] },
+  ) {
+    const date = new Date().toISOString();
+    const ticket = this.ticketsRepository.create({
+      ...ticketData,
+      created_at: date,
+      updated_at: date,
+    });
+    const savedTicket = await this.ticketsRepository.save(ticket);
+
+    for (const item of ticketData.ticket_items) {
+      const ticketItem = this.ticketItemRepository.create({
+        ...item,
+        ticket: savedTicket,
+      });
+      await this.ticketItemRepository.save(ticketItem);
+    }
+
+    let savedDiscounts;
+
+    if (discount) {
+      savedDiscounts = await this.saveDiscountItems(
+        savedTicket.id,
+        discount.disc_items,
+      );
+    }
+
+    return { ...savedTicket, discount: savedDiscounts };
+  }
+
+  private async saveDiscountItems(ticketId: string, discItems: any) {
+    const savedDiscounts = [];
+
+    try {
+      for (const discountItem of discItems) {
+        const discount = this.discountRepository.create({
+          desc_name: discountItem.desc_name,
+          desc_amount: discountItem.desc_amount,
+          ticket: { id: ticketId },
+        });
+
+        const savedDiscount = await this.discountRepository.save(discount);
+        savedDiscounts.push(savedDiscount); // Store the saved discount in the array
+      }
+
+      return savedDiscounts; // Return the array of saved discounts
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to save discounts.'); // Throw an exception for better error handling
+    }
   }
 }

@@ -54,7 +54,7 @@ export class Discount {
   ticket_id: string;
 
   @ManyToOne(() => Ticket, (ticket) => ticket.discount)
-  @JoinColumn({ name: 'id' })
+  @JoinColumn({ name: 'ticket_id' })
   ticket: Relation<Ticket>;
 }
 
