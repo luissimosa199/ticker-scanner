@@ -24,6 +24,7 @@ class MockQueryBuilder {
   leftJoinAndSelect = jest.fn().mockReturnThis();
   where = jest.fn().mockReturnThis();
   andWhere = jest.fn().mockReturnThis();
+  orderBy = jest.fn().mockReturnThis();
   getMany = jest.fn().mockImplementation(() => mockedResult);
 }
 
@@ -37,6 +38,7 @@ describe('ItemsService', () => {
       leftJoinAndSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
       getMany: jest.fn().mockImplementation(() => mockedResult),
     };
 

@@ -20,6 +20,7 @@ export class ItemsService {
       .leftJoinAndSelect('ticket.ticket_items', 'ticket_item')
       .where('ticket_item.name ILIKE :term', { term: `%${term}%` })
       .andWhere('ticket.user_email = :username', { username: username })
+      .orderBy('ticket.date', 'DESC')
       .getMany();
 
     const formattedTickets = tickets

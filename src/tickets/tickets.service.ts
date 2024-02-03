@@ -82,7 +82,7 @@ export class TicketsService {
             user_email: username,
           },
           order: {
-            created_at: 'DESC',
+            date: 'DESC',
           },
           skip: (page - 1) * limit,
           take: limit,
@@ -183,7 +183,7 @@ export class TicketsService {
         limit,
       };
     } catch (error) {
-      throw new InternalServerErrorException('Error retrieving tickets.'); //happening
+      throw new InternalServerErrorException('Error retrieving tickets.');
     }
   }
 
