@@ -29,16 +29,13 @@ export class CotoTicketParser implements SupermarketParser {
           .map((s) => s.trim());
 
         const quantity = parseFloat(quantityString);
-        const price = parseFloat(
-          priceString.replace('$', '').replace(',', '.'),
-        );
 
         const totalString = item.querySelector(
           '.info-producto-price',
         ).textContent;
-        const total = parseFloat(
-          totalString.replace('$', '').replace(',', '.'),
-        );
+
+        const price = this.parseLocaleNumber(priceString);
+        const total = this.parseLocaleNumber(totalString);
 
         return {
           name,
@@ -53,12 +50,12 @@ export class CotoTicketParser implements SupermarketParser {
       throw new HtmlStructureError("Couldn't find articles in the html.");
     }
 
-    const total_amount = parseFloat(
-      doc
-        .querySelector('.info-total-border span.text-right')
-        .innerHTML.replace('$', '')
-        .replace(',', '.'),
-    );
+    const total_amount =
+      Math.abs(
+        this.parseLocaleNumber(
+          doc.querySelector('.info-total-border span.text-right').innerHTML,
+        ),
+      ) || 0;
 
     if (!ticket_items.length) {
       throw new HtmlStructureError("Couldn't find the total html.");
@@ -73,7 +70,8 @@ export class CotoTicketParser implements SupermarketParser {
         .querySelector('.info-ticket-main .text-big-grey.text-left')
         .textContent.replace('Fecha: ', '') || '';
 
-    const date = new Date(dateStr.split('/').reverse().join('-')).toISOString();
+    const [day, month, year] = dateStr.split('/').map(Number);
+    const date = new Date(year + 2000, month - 1, day).toISOString();
 
     let discount = {
       disc_items: [],
@@ -91,11 +89,10 @@ export class CotoTicketParser implements SupermarketParser {
       const discountsItems = Array.from(discountDivs).map((div) => {
         const desc_name = div.querySelector('span.text-left').textContent;
         const desc_amount =
-          parseFloat(
-            (div.querySelector('span.text-right')?.textContent || '')
-              .replace('$', '')
-              .replace(',', '.')
-              .replace('-', ''),
+          Math.abs(
+            this.parseLocaleNumber(
+              div.querySelector('span.text-right')?.textContent || '',
+            ),
           ) || 0;
         return { desc_name, desc_amount };
       });
@@ -105,20 +102,13 @@ export class CotoTicketParser implements SupermarketParser {
       ).find((span) => span.textContent.trim() === 'Ahorro por línea de cajas');
       const disc_span = discsidentifier.nextElementSibling;
       const disc_span_text =
-        parseFloat(
-          disc_span.textContent
-            .replace('$', '')
-            .replace(',', '.')
-            .replace('-', ''),
-        ) || 0;
+        Math.abs(this.parseLocaleNumber(disc_span.textContent)) || 0;
 
       discount = {
         disc_items: discountsItems,
         disc_total: disc_span_text,
       };
     }
-
-    //
 
     const payment_method = doc.querySelector(
       '.info-total-gray .text-left',
@@ -142,5 +132,12 @@ export class CotoTicketParser implements SupermarketParser {
     };
 
     return ticket;
+  }
+
+  parseLocaleNumber(stringNumber: string) {
+    const parts = stringNumber.replace('$', '').replace(/\./g, '').split(',');
+    const integerPart = parts.slice(0, -1).join('');
+    const decimalPart = parts.slice(-1)[0];
+    return parseFloat(integerPart + '.' + decimalPart);
   }
 }
