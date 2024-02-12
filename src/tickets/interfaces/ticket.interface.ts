@@ -11,7 +11,7 @@ export interface DiscountItem {
 }
 
 export interface Discounts {
-  disc_items: DiscountItem[];
+  desc_items: DiscountItem[];
   disc_total: number;
 }
 

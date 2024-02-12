@@ -80,7 +80,7 @@ export const expectedTicketMockp = {
   address: 'Intendente Garcia Silva 855',
   date: '11/10/2023',
   discount: {
-    disc_items: [
+    desc_items: [
       {
         desc_name: 'OI_10%_PATAGONIA 1 Litros',
         desc_amount: 196.77,

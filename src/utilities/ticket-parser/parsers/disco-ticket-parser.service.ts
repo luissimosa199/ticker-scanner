@@ -114,11 +114,11 @@ export class DiscoTicketParser implements SupermarketParser {
 
     // DISCOUNTS
     const discountsTable = doc.querySelector('table.table-discounts');
-    let disc_items: { desc_name: string; desc_amount: number }[] = [];
+    let desc_items: { desc_name: string; desc_amount: number }[] = [];
     let disc_total: number = 0;
 
     if (discountsTable) {
-      disc_items = Array.from(
+      desc_items = Array.from(
         discountsTable.querySelectorAll('tbody tr'),
         (tr) => {
           const tds = tr.querySelectorAll('td');
@@ -140,7 +140,7 @@ export class DiscoTicketParser implements SupermarketParser {
     }
 
     const discount = {
-      disc_items,
+      desc_items,
       disc_total,
     };
 

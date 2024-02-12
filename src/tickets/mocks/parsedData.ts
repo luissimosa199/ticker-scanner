@@ -80,7 +80,7 @@ export const parsedData = {
   address: 'Intendente Garcia Silva 855',
   date: '2023-10-11T00:00:00.000Z',
   discount: {
-    disc_items: [
+    desc_items: [
       {
         desc_name: 'OI_10%_PATAGONIA 1 Litros',
         desc_amount: 196.77,

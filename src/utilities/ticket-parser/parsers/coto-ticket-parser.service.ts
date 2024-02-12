@@ -74,7 +74,7 @@ export class CotoTicketParser implements SupermarketParser {
     const date = new Date(year + 2000, month - 1, day).toISOString();
 
     let discount = {
-      disc_items: [],
+      desc_items: [],
       disc_total: 0,
     };
 
@@ -105,7 +105,7 @@ export class CotoTicketParser implements SupermarketParser {
         Math.abs(this.parseLocaleNumber(disc_span.textContent)) || 0;
 
       discount = {
-        disc_items: discountsItems,
+        desc_items: discountsItems,
         disc_total: disc_span_text,
       };
     }

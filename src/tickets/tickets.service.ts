@@ -210,7 +210,7 @@ export class TicketsService {
 
   async createTicketAndRelatedData(
     ticketData: Ticket,
-    discount: { disc_items: { desc_name: string; desc_amount: number }[] },
+    discount: { desc_items: { desc_name: string; desc_amount: number }[] },
   ) {
     const date = new Date().toISOString();
     const ticket = this.ticketsRepository.create({
@@ -233,7 +233,7 @@ export class TicketsService {
     if (discount) {
       savedDiscounts = await this.saveDiscountItems(
         savedTicket.id,
-        discount.disc_items,
+        discount.desc_items,
       );
     }
 
