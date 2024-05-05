@@ -10,6 +10,7 @@ import { ItemsModule } from './items/items.module';
 import { FetchHtmlController } from './fetch-html/fetch-html.controller';
 import { HttpModule } from '@nestjs/axios';
 import { FetchHtmlService } from './fetch-html/fetch-html.service';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { FetchHtmlService } from './fetch-html/fetch-html.service';
     UsersModule,
     ItemsModule,
     HttpModule,
+    StatsModule,
   ],
   controllers: [AppController, FetchHtmlController],
   providers: [AppService, FetchHtmlService],
