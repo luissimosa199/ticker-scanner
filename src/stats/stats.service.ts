@@ -31,17 +31,45 @@ export class StatsService {
     const firstScanDate = await this.getFirstScanDate(username);
     const monthlyStatistics = await this.getMonthlyStatistics(username);
 
-    const mainStats = {
-      totalCount,
-      totalSpent,
-      totalSpentLastYear,
-      totalSpentLast90Days,
-      totalSpentLast30Days,
-      mostFrequentlyBoughtItems,
-      totalDiscount,
-      firstScanDate,
-      monthlyStatistics,
-    };
+    const mainStats = [
+      { name: 'total count', id: 'TOTAL_COUNT', data: totalCount },
+      { name: 'total spent', id: 'TOTAL_SPENT', data: totalSpent },
+      {
+        name: 'total spent last year',
+        id: 'TOTAL_SPENT_LAST_YEAR',
+        data: totalSpentLastYear,
+      },
+      {
+        name: 'total spent 90 days',
+        id: 'TOTAL_SPENT_LAST_90_DAYS',
+        data: totalSpentLast90Days,
+      },
+      {
+        name: 'total spent 30 days',
+        id: 'TOTAL_SPENT_LAST_30_DAYS',
+        data: totalSpentLast30Days,
+      },
+      {
+        name: 'most frquently bought items',
+        id: 'MOST_FREQUENTLY_BOUGHT_ITEM',
+        data: mostFrequentlyBoughtItems,
+      },
+      {
+        name: 'total discounts',
+        id: 'TOTAL_DISCOUNT',
+        data: totalDiscount,
+      },
+      {
+        name: 'first scan date',
+        id: 'FIRST_SCAN_DATE',
+        data: firstScanDate,
+      },
+      {
+        name: 'monthly statistics',
+        id: 'MONTHLY_STATISTICS',
+        data: monthlyStatistics,
+      },
+    ];
 
     return mainStats;
   }
