@@ -6,6 +6,7 @@ import { DiscoTicketParser } from 'src/utilities/ticket-parser/parsers/disco-tic
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Discount, Ticket, TicketItem } from './entities/ticket.entity';
 import { CotoTicketParser } from '../utilities/ticket-parser/parsers/coto-ticket-parser.service';
+import { HtmlToMarkdownModule } from 'src/html-to-markdown/html-to-markdown.module';
 
 @Module({
   controllers: [TicketsController],
@@ -13,6 +14,7 @@ import { CotoTicketParser } from '../utilities/ticket-parser/parsers/coto-ticket
     TypeOrmModule.forFeature([Ticket]),
     TypeOrmModule.forFeature([TicketItem]),
     TypeOrmModule.forFeature([Discount]),
+    HtmlToMarkdownModule,
   ],
   providers: [
     DiscoTicketParser,
