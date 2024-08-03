@@ -11,6 +11,7 @@ import {
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { htmlMock } from './mocks/htmlMock';
 
 @Controller('tickets')
 export class TicketsController {
@@ -18,6 +19,13 @@ export class TicketsController {
 
   @Post()
   create(@Body() createTicketDto: CreateTicketDto) {
+    return this.ticketsService.create(createTicketDto);
+  }
+
+  @Post('/test')
+  test(@Body() createTicketDto: CreateTicketDto) {
+    createTicketDto.rawTicketHTML = htmlMock;
+    // pass text to ai module and return the resulting object
     return this.ticketsService.create(createTicketDto);
   }
 
