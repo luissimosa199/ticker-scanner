@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as TurndownService from 'turndown';
+import * as cheerio from 'cheerio';
 
 @Injectable()
 export class HtmlToMarkdownService {
@@ -10,6 +11,17 @@ export class HtmlToMarkdownService {
   }
 
   convertHtmlToMarkdown(html: string): string {
-    return this.turndownService.turndown(html);
+    const cleanedHtml = this.cleanHtml(html);
+    const result = this.turndownService.turndown(cleanedHtml);
+    console.log('\n', result, '\n');
+    return result;
+  }
+
+  cleanHtml(html: string): string {
+    const $ = cheerio.load(html);
+    // Remove <script> and <style> tags
+    $('script').remove();
+    $('style').remove();
+    return $.html();
   }
 }
