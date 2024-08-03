@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import TurndownService from 'turndown';
+import * as TurndownService from 'turndown';
 
 @Injectable()
 export class HtmlToMarkdownService {
