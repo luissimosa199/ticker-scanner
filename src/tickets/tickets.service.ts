@@ -10,6 +10,7 @@ import { TicketParserService } from 'src/utilities/ticket-parser/ticket-parser.s
 import { Discount, Ticket, TicketItem } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
+import { HtmlToMarkdownService } from 'src/html-to-markdown/html-to-markdown.service';
 
 @Injectable()
 export class TicketsService {
@@ -21,16 +22,24 @@ export class TicketsService {
     private ticketItemRepository: Repository<TicketItem>,
     @InjectRepository(Discount)
     private discountRepository: Repository<Discount>,
+    private htmlToMarkdownService: HtmlToMarkdownService,
   ) {}
 
-  create(createTicketDto: CreateTicketDto) {
-    const parsedData = this.ticketParser.parse(
-      createTicketDto.supermarket,
-      createTicketDto.rawTicketHTML,
-      createTicketDto.og_ticket_url,
-    );
+  // create(createTicketDto: CreateTicketDto) {
+  //   const parsedData = this.ticketParser.parse(
+  //     createTicketDto.supermarket,
+  //     createTicketDto.rawTicketHTML,
+  //     createTicketDto.og_ticket_url,
+  //   );
 
-    return { ...parsedData, supermarket: createTicketDto.supermarket };
+  //   return { ...parsedData, supermarket: createTicketDto.supermarket };
+  // }
+
+  create(createTicketDto: CreateTicketDto) {
+    const parsedData = this.htmlToMarkdownService.convertHtmlToMarkdown(
+      createTicketDto.rawTicketHTML,
+    );
+    return { parsedData, supermarket: createTicketDto.supermarket };
   }
 
   async createAndSave(createTicketDto: CreateTicketDto, user_email: string) {
