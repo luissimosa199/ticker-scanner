@@ -11,6 +11,7 @@ import { FetchHtmlController } from './fetch-html/fetch-html.controller';
 import { HttpModule } from '@nestjs/axios';
 import { FetchHtmlService } from './fetch-html/fetch-html.service';
 import { StatsModule } from './stats/stats.module';
+import { HtmlToMarkdownModule } from './html-to-markdown/html-to-markdown.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { StatsModule } from './stats/stats.module';
     ItemsModule,
     HttpModule,
     StatsModule,
+    HtmlToMarkdownModule,
   ],
   controllers: [AppController, FetchHtmlController],
   providers: [AppService, FetchHtmlService],
