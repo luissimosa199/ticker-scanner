@@ -11,6 +11,8 @@ import { Discount, Ticket, TicketItem } from './entities/ticket.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import { HtmlToMarkdownService } from 'src/html-to-markdown/html-to-markdown.service';
+import { OpenAiService } from 'src/open-ai/open-ai.service';
+import { SupermarketUtils } from 'src/utilities/supermarket.util';
 
 @Injectable()
 export class TicketsService {
@@ -23,6 +25,7 @@ export class TicketsService {
     @InjectRepository(Discount)
     private discountRepository: Repository<Discount>,
     private htmlToMarkdownService: HtmlToMarkdownService,
+    private readonly openAiService: OpenAiService,
   ) {}
 
   // create(createTicketDto: CreateTicketDto) {
@@ -35,11 +38,41 @@ export class TicketsService {
   //   return { ...parsedData, supermarket: createTicketDto.supermarket };
   // }
 
-  create(createTicketDto: CreateTicketDto) {
+  async create(createTicketDto: CreateTicketDto) {
     const parsedData = this.htmlToMarkdownService.convertHtmlToMarkdown(
       createTicketDto.rawTicketHTML,
     );
-    return { parsedData, supermarket: createTicketDto.supermarket };
+
+    const jsonRawData = await this.openAiService.parseTicketToJson(parsedData);
+
+    const ticketData = JSON.parse(jsonRawData) as Omit<
+      Ticket,
+      'id' | 'user_email' | 'date' | 'created_at' | 'updated_at'
+    >;
+
+    const date = new Date().toISOString();
+    const logo_link =
+      SupermarketUtils.getLogo(
+        SupermarketUtils.getSupermarketFromName(ticketData.supermarket),
+      ) || '';
+    const og_ticket_url = createTicketDto.og_ticket_url;
+    const supermarket =
+      SupermarketUtils.getSupermarketFromName(ticketData.supermarket) ||
+      ticketData.supermarket;
+
+    const isValid = this.validateTicketObject(ticketData);
+
+    if (isValid) {
+      return {
+        ...ticketData,
+        date,
+        logo_link,
+        og_ticket_url,
+        supermarket,
+      };
+    } else {
+      // handle failed validations
+    }
   }
 
   async createAndSave(createTicketDto: CreateTicketDto, user_email: string) {
@@ -196,8 +229,8 @@ export class TicketsService {
     }
   }
 
-  findOne(id: string, user_email: string) {
-    const ticket = this.ticketsRepository.findOne({
+  async findOne(id: string, user_email: string) {
+    const ticket = await this.ticketsRepository.findOne({
       where: {
         id,
         user_email,
@@ -269,5 +302,106 @@ export class TicketsService {
       console.log(err);
       throw new Error('Failed to save discounts.'); // Throw an exception for better error handling
     }
+  }
+
+  private validateTicketObject(ticketObject) {
+    const schema = {
+      total_amount: 'number',
+      address: 'string',
+      payment_method: 'string',
+      supermarket: 'string',
+      ticket_items: 'array',
+      discount: 'object',
+    };
+
+    const itemSchema = {
+      name: 'string',
+      quantity: 'number',
+      price: 'number',
+      total: 'number',
+    };
+
+    const discountSchema = {
+      desc_items: 'array',
+      desc_total: 'number',
+    };
+
+    const descItemSchema = {
+      desc_name: 'string',
+      desc_amount: 'number',
+    };
+
+    function validateSchema(obj, schema, prefix) {
+      for (const key in schema) {
+        if (!obj.hasOwnProperty(key)) {
+          return { success: false, message: `Missing field: ${prefix}${key}` };
+        }
+
+        if (schema[key] === 'array') {
+          if (!Array.isArray(obj[key])) {
+            return {
+              success: false,
+              message: `Incorrect type for field: ${prefix}${key}. Expected array but got ${typeof obj[
+                key
+              ]}`,
+            };
+          }
+        } else if (schema[key] === 'object') {
+          if (typeof obj[key] !== 'object' || Array.isArray(obj[key])) {
+            return {
+              success: false,
+              message: `Incorrect type for field: ${prefix}${key}. Expected object but got ${typeof obj[
+                key
+              ]}`,
+            };
+          }
+        } else if (typeof obj[key] !== schema[key]) {
+          return {
+            success: false,
+            message: `Incorrect type for field: ${prefix}${key}. Expected ${
+              schema[key]
+            } but got ${typeof obj[key]}`,
+          };
+        }
+      }
+      return { success: true };
+    }
+
+    let result = validateSchema(ticketObject, schema, '');
+    if (!result.success) return result;
+
+    if (!Array.isArray(ticketObject.ticket_items)) {
+      return { success: false, message: 'ticket_items should be an array' };
+    }
+
+    for (let i = 0; i < ticketObject.ticket_items.length; i++) {
+      result = validateSchema(
+        ticketObject.ticket_items[i],
+        itemSchema,
+        `ticket_items[${i}].`,
+      );
+      if (!result.success) return result;
+    }
+
+    result = validateSchema(ticketObject.discount, discountSchema, 'discount.');
+    if (!result.success) return result;
+
+    if (!Array.isArray(ticketObject.discount.desc_items)) {
+      return {
+        success: false,
+        message: 'discount.desc_items should be an array',
+      };
+    }
+
+    for (let i = 0; i < ticketObject.discount.desc_items.length; i++) {
+      result = validateSchema(
+        ticketObject.discount.desc_items[i],
+        descItemSchema,
+        `discount.desc_items[${i}].`,
+      );
+      if (!result.success) return result;
+    }
+
+    return { success: true, message: 'Validation successful' };
   }
 }

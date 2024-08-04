@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Discount, Ticket, TicketItem } from './entities/ticket.entity';
 import { CotoTicketParser } from '../utilities/ticket-parser/parsers/coto-ticket-parser.service';
 import { HtmlToMarkdownModule } from 'src/html-to-markdown/html-to-markdown.module';
+import { OpenAiModule } from 'src/open-ai/open-ai.module';
 
 @Module({
   controllers: [TicketsController],
@@ -15,6 +16,7 @@ import { HtmlToMarkdownModule } from 'src/html-to-markdown/html-to-markdown.modu
     TypeOrmModule.forFeature([TicketItem]),
     TypeOrmModule.forFeature([Discount]),
     HtmlToMarkdownModule,
+    OpenAiModule,
   ],
   providers: [
     DiscoTicketParser,
