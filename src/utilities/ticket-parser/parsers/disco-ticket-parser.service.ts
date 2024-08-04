@@ -5,7 +5,7 @@ import { SupermarketParser } from '../interfaces/supermarket-parser.interface';
 import { JSDOM } from 'jsdom';
 import { HtmlStructureError } from '../errors/html-structure.error';
 import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
-import { SupermarketLogoUtil } from 'src/utilities/supermarket-logo.util';
+import { SupermarketUtils } from 'src/utilities/supermarket.util';
 
 @Injectable()
 export class DiscoTicketParser implements SupermarketParser {
@@ -96,7 +96,7 @@ export class DiscoTicketParser implements SupermarketParser {
     }
 
     // LOGO LINK
-    const logo_link = SupermarketLogoUtil.getLogo(supermarket);
+    const logo_link = SupermarketUtils.getLogo(supermarket);
 
     // ADDRESS
     const addressElement = doc.querySelector('.company-header:nth-child(3)');

@@ -1,6 +1,6 @@
 import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
 
-export class SupermarketLogoUtil {
+export class SupermarketUtils {
   private static logoMap = new Map<Supermarket, string>([
     [
       Supermarket.DISCO,
@@ -27,5 +27,23 @@ export class SupermarketLogoUtil {
 
   static getLogo(supermarketName: Supermarket): string {
     return this.logoMap.get(supermarketName);
+  }
+
+  static getSupermarketFromName(name: string): Supermarket | undefined {
+    const supermarketPatterns = new Map<Supermarket, RegExp>([
+      [Supermarket.DISCO, /DISCO/i],
+      [Supermarket.JUMBO, /JUMBO/i],
+      [Supermarket.EASY, /EASY/i],
+      [Supermarket.VEA, /VEA/i],
+      [Supermarket.COTO, /COTO/i],
+      // add more patterns as needed
+    ]);
+
+    for (const [supermarket, pattern] of supermarketPatterns.entries()) {
+      if (pattern.test(name)) {
+        return supermarket;
+      }
+    }
+    return undefined;
   }
 }

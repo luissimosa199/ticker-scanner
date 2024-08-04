@@ -4,7 +4,7 @@ import { SupermarketParser } from '../interfaces/supermarket-parser.interface';
 import { JSDOM } from 'jsdom';
 import { HtmlStructureError } from '../errors/html-structure.error';
 import { Supermarket } from 'src/tickets/dto/create-ticket.dto';
-import { SupermarketLogoUtil } from 'src/utilities/supermarket-logo.util';
+import { SupermarketUtils } from 'src/utilities/supermarket.util';
 
 @Injectable()
 export class CotoTicketParser implements SupermarketParser {
@@ -61,7 +61,7 @@ export class CotoTicketParser implements SupermarketParser {
       throw new HtmlStructureError("Couldn't find the total html.");
     }
 
-    const logo_link = SupermarketLogoUtil.getLogo(supermarket);
+    const logo_link = SupermarketUtils.getLogo(supermarket);
 
     const address = doc.querySelector('.info-direccion').textContent || '';
 
