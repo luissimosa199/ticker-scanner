@@ -13,7 +13,6 @@ export class HtmlToMarkdownService {
   convertHtmlToMarkdown(html: string): string {
     const cleanedHtml = this.cleanHtml(html);
     const result = this.turndownService.turndown(cleanedHtml);
-    console.log('\n', result, '\n');
     return result;
   }
 
