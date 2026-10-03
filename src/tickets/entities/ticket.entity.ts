@@ -91,7 +91,8 @@ export class Ticket {
   @Column()
   supermarket: string;
 
-  @Column()
+  // Hidden from API responses; still usable in WHERE filters.
+  @Column({ select: false })
   user_email?: string;
 
   @CreateDateColumn()
