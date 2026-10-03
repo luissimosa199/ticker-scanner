@@ -13,6 +13,7 @@ import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { CreateUserDto } from './users/dto/create-user.dto';
 import { UsersService } from './users/users.service';
+import { DeprecatedGuard } from './global/guards/deprecated.guard';
 
 @Controller()
 export class AppController {
@@ -21,7 +22,7 @@ export class AppController {
     private usersService: UsersService,
   ) {}
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(DeprecatedGuard, LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
     return this.authService.login(req.user.email, req.body.password);
@@ -33,6 +34,7 @@ export class AppController {
     return req.user;
   }
 
+  @UseGuards(DeprecatedGuard)
   @Post('auth/register')
   async register(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     const existingUser = await this.usersService.findOne(createUserDto.email);

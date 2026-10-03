@@ -4,16 +4,20 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OpenAiService {
-  private openai: OpenAI;
+  private openai?: OpenAI;
 
-  constructor(private configService: ConfigService) {
-    this.openai = new OpenAI({
+  constructor(private configService: ConfigService) {}
+
+  // Created on first use so the app can boot without OPENAI_API_KEY (scanning is deprecated).
+  private get client(): OpenAI {
+    this.openai ??= new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_API_KEY'),
     });
+    return this.openai;
   }
 
   async parseTicketToJson(rawBill: string): Promise<string> {
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model: 'gpt-4o-mini',
       response_format: { type: 'json_object' },
       messages: [
